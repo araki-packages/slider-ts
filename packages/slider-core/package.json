@@ -1,8 +1,8 @@
 {
   "name": "@araki-packages/slider-core",
   "version": "0.0.4",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.esm.js",
+  "module": "dist/index.cjs.js",
   "types": "dist/index.d.ts",
   "files": [
     "LICENSE",

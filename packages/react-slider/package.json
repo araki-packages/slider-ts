@@ -19,14 +19,13 @@
   "license": "MIT",
   "devDependencies": {
     "@types/react": "^16.9.35",
-    "@types/react-dom": "^16.9.8",
-    "ts-node": "^8.10.1"
+    "@types/react-dom": "^16.9.8"
   },
   "peerDependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
   "dependencies": {
-    "@araki-packages/slider-core": "^0.0.3"
+    "@araki-packages/slider-core": "^0.0.4"
   }
 }
