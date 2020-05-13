@@ -6,7 +6,6 @@ const commonjs = require('@rollup/plugin-commonjs');
 const C = require('../tasks/constants');
 const path = require('path');
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
-const babel = require("@rollup/plugin-babel");
 
 const generateAtTypesRollup = (options) => ({
   input:{
@@ -31,28 +30,29 @@ const generateAtTypesRollup = (options) => ({
   },
 });
 
+const base = (options) => ({
+  input: options.input,
+  plugins: [
+    resolve({ extensions }),
+    typescript({
+      tsconfig: path.resolve(C.PROJECT_ROOT, 'tsconfig.json'),
+    }),
+    commonjs(),
+  ],
+  external(id) {
+    const isNodeModules = !(/\.+\//.test(id));
+    const ignore = options.ignoreNodeModules ? isNodeModules : false;
+    if (ignore) {
+      console.log(`-- ${id} `);
+    } else {
+      console.log(`++ ${id} `);
+    }
+    return ignore;
+  },
+});
 
 const generateRollupCJS = (options) => ({
-  input: {
-    input: options.input,
-    plugins: [
-      typescript({
-        tsconfig: path.resolve(C.PROJECT_ROOT, 'tsconfig.json'),
-      }),
-      babel(),
-      commonjs(),
-    ],
-    external(id) {
-      const isNodeModules = !(/\.+\//.test(id));
-      const ignore = options.ignoreNodeModules ? isNodeModules : false;
-      if (ignore) {
-        console.log(`-- ${id} `);
-      } else {
-        console.log(`++ ${id} `);
-      }
-      return ignore;
-    },
-  },
+  input: base(options),
   output: {
     file: path.resolve(path.dirname(options.input), 'dist', 'main.cjs.js'),
     format: 'cjs',
@@ -60,26 +60,7 @@ const generateRollupCJS = (options) => ({
 });
 
 const generateRollupESM = (options)  => ({
-  input: {
-    input: options.input,
-    plugins: [
-      resolve({ extensions }),
-      typescript({
-        tsconfig: path.resolve(C.PROJECT_ROOT, 'tsconfig.json'),
-      }),
-      commonjs(),
-    ],
-    external(id) {
-      const isNodeModules = !(/\.+\//.test(id));
-      const ignore = options.ignoreNodeModules ? isNodeModules : false;
-      if (ignore) {
-        console.log(`-- ${id} `);
-      } else {
-        console.log(`++ ${id} `);
-      }
-      return ignore;
-    },
-  },
+  input: base(options),
   output: {
     file: path.resolve(path.dirname(options.input), 'dist', 'main.esm.js'),
     format: 'es',
