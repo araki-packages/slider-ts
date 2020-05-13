@@ -31,6 +31,7 @@ const generateAtTypesRollup = (options) => ({
   },
 });
 
+
 const generateRollupCJS = (options) => ({
   input: {
     input: options.input,
@@ -53,10 +54,8 @@ const generateRollupCJS = (options) => ({
     },
   },
   output: {
-    minifyInternalExports: true,
-    compact: true,
     file: path.resolve(path.dirname(options.input), 'dist', 'main.cjs.js'),
-    format: 'es',
+    format: 'cjs',
   }
 });
 
@@ -82,9 +81,7 @@ const generateRollupESM = (options)  => ({
     },
   },
   output: {
-    minifyInternalExports: true,
-    compact: true,
-    file: path.resolve(path.dirname(options.input), 'dist', 'main.cjs.js'),
+    file: path.resolve(path.dirname(options.input), 'dist', 'main.esm.js'),
     format: 'es',
   }
 });
@@ -98,10 +95,13 @@ const buildProcess = async (package, type) => {
   const rollupConfig = (() => {
     switch(type){
       case 'esm':
+        console.log('GENERATE ESM');
         return generateRollupESM({ input: entryFile, ignoreNodeModules: true });
       case 'cjs':
+        console.log('GENERATE CJS');
         return generateRollupCJS({ input: entryFile, ignoreNodeModules: true });
       case 'dts':
+        console.log('GENERATE DTS');
         return generateAtTypesRollup({ input: entryFile, ignoreNodeModules: true, });
       default:
         throw new Error('not found output')
