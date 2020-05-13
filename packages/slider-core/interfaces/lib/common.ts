@@ -1,4 +1,3 @@
-
 export interface SliderOptions {
   isLoop?: boolean; // 無限スクロールするかどうか
   isFit?: boolean; // 位置を同期させるかどうか

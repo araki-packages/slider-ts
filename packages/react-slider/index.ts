@@ -1,2 +1,1 @@
-import { Slider } from "@araki-packages/slider-core";
-
+export { SliderComponent } from './lib/SliderComponent';
