@@ -1,4 +1,6 @@
-import { SpeedCalculator } from './lib/SpeedCalculator';
+import { Slider }  from './lib/Slider'
+console.log('hello');
 
-
-export { Slider } from './lib/Slider'
+export default {
+  Slider,
+};

@@ -6,6 +6,7 @@ const commonjs = require('@rollup/plugin-commonjs');
 const C = require('../tasks/constants');
 const path = require('path');
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+const babel = require("@rollup/plugin-babel");
 
 const generateAtTypesRollup = (options) => ({
   input:{
@@ -34,10 +35,10 @@ const generateRollupCJS = (options) => ({
   input: {
     input: options.input,
     plugins: [
-      resolve({ extensions }),
       typescript({
         tsconfig: path.resolve(C.PROJECT_ROOT, 'tsconfig.json'),
       }),
+      babel(),
       commonjs(),
     ],
     external(id) {
@@ -52,8 +53,10 @@ const generateRollupCJS = (options) => ({
     },
   },
   output: {
+    minifyInternalExports: true,
+    compact: true,
     file: path.resolve(path.dirname(options.input), 'dist', 'main.cjs.js'),
-    format: 'cjs',
+    format: 'es',
   }
 });
 
@@ -79,6 +82,8 @@ const generateRollupESM = (options)  => ({
     },
   },
   output: {
+    minifyInternalExports: true,
+    compact: true,
     file: path.resolve(path.dirname(options.input), 'dist', 'main.cjs.js'),
     format: 'es',
   }

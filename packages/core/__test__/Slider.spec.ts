@@ -1,5 +1,5 @@
 import { Slider } from '../lib/Slider'
-import { useSpyRequestAnimationFrame, useSpyPerformanceNow } from './util';
+import { useSpyRequestAnimationFrame, useSpyPerformanceNow } from './util/index';
 
 requestAnimationFrame(() => {
   console.log('hoge');

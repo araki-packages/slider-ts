@@ -11,6 +11,10 @@
   "homepage": "https://github.com/araki-packages/typescript-monorepo-template/wiki",
   "bugs": "https://github.com/araki-packages/typescript-monorepo-template/issues",
   "devDependencies": {
+    "@babel/core": "7.8.7",
+    "@babel/preset-env": "7.8.7",
+    "@babel/preset-typescript": "7.8.3",
+    "@rollup/plugin-babel": "^5.0.0",
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
     "@rollup/plugin-typescript": "^4.0.0",
