@@ -25,7 +25,7 @@ const generateAtTypesRollup = (options) => ({
     },
   },
   output: {
-    file: path.resolve(path.dirname(options.input), 'dist', 'main.d.ts'),
+    file: path.resolve(path.dirname(options.input), 'dist', 'index.d.ts'),
     format: 'esm',
   },
 });
@@ -54,7 +54,7 @@ const base = (options) => ({
 const generateRollupCJS = (options) => ({
   input: base(options),
   output: {
-    file: path.resolve(path.dirname(options.input), 'dist', 'main.cjs.js'),
+    file: path.resolve(path.dirname(options.input), 'dist', 'index.cjs.js'),
     format: 'cjs',
   }
 });
@@ -62,7 +62,7 @@ const generateRollupCJS = (options) => ({
 const generateRollupESM = (options)  => ({
   input: base(options),
   output: {
-    file: path.resolve(path.dirname(options.input), 'dist', 'main.esm.js'),
+    file: path.resolve(path.dirname(options.input), 'dist', 'index.esm.js'),
     format: 'es',
   }
 });

@@ -1,4 +1,2 @@
-import { Slider }  from './lib/Slider'
-export default {
-  Slider,
-};
+import a from '@araki-packages/slider-core'
+console.log(a);
