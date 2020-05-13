@@ -1,5 +1,5 @@
 {
-  "name": "@araki-packages/sandbox-monorepo-core",
+  "name": "@araki-packages/slider-core",
   "version": "1.0.3",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
