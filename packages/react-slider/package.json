@@ -9,12 +9,12 @@
     "README.md",
     "dist/"
   ],
-  "homepage": "https://github.com/araki-packages/typescript-monorepo-template/wiki",
-  "bugs": "https://github.com/araki-packages/typescript-monorepo-template/issues",
+  "homepage": "https://github.com/araki-packages/slider-ts/wiki",
+  "bugs": "https://github.com/araki-packages/slider-ts/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/araki-packages/typescript-monorepo-template",
-    "directory": "packages/core"
+    "url": "https://github.com/araki-packages/slider-ts",
+    "directory": "packages/react-slider"
   },
   "license": "MIT",
   "devDependencies": {
@@ -22,8 +22,7 @@
     "@types/react-dom": "^16.9.8"
   },
   "peerDependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react": "^16.13.1"
   },
   "dependencies": {
     "@araki-packages/slider-core": "^0.0.4"
