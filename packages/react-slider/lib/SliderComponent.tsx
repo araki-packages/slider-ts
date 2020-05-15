@@ -21,9 +21,7 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
 
   // event listeners
   const handleStart = React.useCallback((x: number) => {
-
     sliderInstance.start(x);
-
     // update event
     const mouseMoveHandler = (e: MouseEvent) => sliderInstance.update(e.pageX);
     const touchMoveHandler = (e: TouchEvent) => sliderInstance.update(e.touches[0].pageX);
@@ -33,11 +31,13 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
 
     // end event
     const mouseUpHandler = () => {
+      sliderInstance.end();
       window.removeEventListener('mousemove', mouseMoveHandler);
       window.removeEventListener('mouseup', mouseUpHandler);
     };
 
     const touchEndHandler = () => {
+      sliderInstance.end();
       window.removeEventListener('touchmove', touchMoveHandler);
       window.removeEventListener('touchend', touchEndHandler);
     };
@@ -87,13 +87,13 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
           {
             Array(copyNum)
               .fill(1)
-              .map((_, index) => components[components.length - 1 - index])
+              .map((_, index) => components[components.length - (copyNum - index)])
           }
           { components }
           {
             Array(copyNum)
               .fill(1)
-              .map((_, index) =>  {components[index]})
+              .map((_, index) =>  components[index])
           }
       </div>
     </div>

@@ -15,27 +15,42 @@ const createMockImageUrl = (seed) => {
   return `https://dummyimage.com/600x400/${back}/${type}`;
 };
 
-const ImageComponent = (seed) => {
-  return <img src={createMockImageUrl(seed)}/>
+const ImageComponent = ({seed, name}) => {
+  console.log(seed);
+  return <div
+    style={{
+      width: 200,
+      height: 200,
+      userSelect: 'none',
+      backgroundImage: `url(${createMockImageUrl(seed)})`,
+    }}
+    onDragStart={(e) => {
+      e.stopPropagation();
+    }}
+
+    data-name={name}
+  />
 }
 const ImageSlider = () => {
   console.log(new Slider());
   const Components = React.useMemo(() => {
     return [
-      <ImageComponent seed={0xFFFFFF}/>,
-      <ImageComponent seed={0xAAAAAA}/>,
-      <ImageComponent seed={0xDDDDDD}/>,
-      <ImageComponent seed={0x000000}/>,
-      <ImageComponent seed={0x444444}/>,
-      <ImageComponent seed={0xAAAAAA}/>,
-      <ImageComponent seed={0xbbbbbb}/>,
+      <ImageComponent name={'0'} seed={0xFFFFFF}/>,
+      <ImageComponent name={'1'} seed={0xAAAAAA}/>,
+      <ImageComponent name={'2'} seed={0xDDDDDD}/>,
+      <ImageComponent name={'3'} seed={0x000000}/>,
+      <ImageComponent name={'4'} seed={0x444444}/>,
+      <ImageComponent name={'5'} seed={0xAAAAAA}/>,
+      <ImageComponent name={'6'} seed={0xbbbbbb}/>,
     ];
   });
   return (
     <>
       <SliderComponent
         components={Components}
-        copyNum={3}
+        offsetLeft={100}
+        isLoop
+        copyNum={2}
       />
     </>
   );

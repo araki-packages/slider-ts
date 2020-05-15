@@ -61,42 +61,38 @@ export class Slider {
 
   // 場所のアップデート
   public update(x: number) {
-    this.deltaMove = x - this.deltaMove;
+    const moveOffset = this.deltaMove - x;
     this.deltaTime = this.deltaTime - performance.now();
-    this.currentX += this.deltaMove;
-
+    this.currentX -= moveOffset;
     this.updateLocation();
     this.handleChange();
-
-    this.speedCalc.add(this.deltaMove / this.deltaTime * 50);
-    this.movementPosition += this.deltaMove;
-    this.deltaMove = 0;
+    this.speedCalc.add(moveOffset / this.deltaTime * 50);
+    this.movementPosition += moveOffset;
     this.deltaTime = performance.now();
+    this.deltaMove = x;
   }
 
   public handleChange() {
-    const position = this.currentX + this.offsetLeft;
+    const position = this.currentX;
     const index = Math.floor(Math.abs(this.currentX) / this.itemWidth) % (this.elementNum + this.copyElementNum * 2);
-    this.onChange && this.onChange(position - this.copyElementNum * this.itemWidth, index);
+    this.onChange && this.onChange(position - this.offsetLeft, index);
   }
-
   // ロケーションのアップデート
   public updateLocation() {
     const maxLength = this.itemWidth * this.elementNum;
-
     if (this.isLoop) {
-      if (this.currentX < maxLength) {
-        this.currentX = this.currentX % maxLength;
-      }
       if (this.currentX > 0) {
-        this.currentX = maxLength + (this.currentX % maxLength);
+        this.currentX %= maxLength;
+      }
+      if (this.currentX < maxLength) {
+        this.currentX %= maxLength;
       }
     } else {
-      if (this.currentX < maxLength + this.itemWidth) {
-        this.currentX = maxLength + this.itemWidth;
+      if (this.currentX > -1) {
+          this.currentX = 0;
       }
-      if (this.currentX > 0) {
-        this.currentX = -1;
+      if (this.currentX < maxLength * -1) {
+          this.currentX = maxLength * -1;
       }
     }
   }
@@ -174,7 +170,7 @@ export class Slider {
     const maxTime = Math.max(Math.abs(speed / 5), 200); // 速度の算出（最低２００ｍｓ）
     const tick = (time: number) => {
       if (elapsedTime > maxTime) {
-        this.currentX = position + movementPosition;
+        this.currentX = position - movementPosition;
         this.updateLocation();
         this.handleChange();
         this.onEnd && this.onEnd();
@@ -184,7 +180,7 @@ export class Slider {
       elapsedTime += deltaTime;
       const offsetPosition = Math.sin((elapsedTime / maxTime) * (Math.PI / 2))
       const movement = offsetPosition * movementPosition;
-      this.currentX = position + movement;
+      this.currentX = position - movement;
       this.updateLocation();
       this.handleChange();
       deltaTime = time;
