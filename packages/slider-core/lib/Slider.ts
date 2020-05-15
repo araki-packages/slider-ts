@@ -1,6 +1,7 @@
 import { SpeedCalculator } from './SpeedCalculator';
 import { SliderOptions } from '../interfaces/lib/common';
 import { InitialSliderOptions } from '../constants/lib/common';
+import { isThisTypeNode } from 'typescript';
 
 export class Slider {
   private width!: number; // 全体の長さ
@@ -46,8 +47,7 @@ export class Slider {
     this.isLoop = setOption.isLoop;
     this.offsetLeft = setOption.offsetLeft;
     this.isFit = setOption.isFit;
-
-    this.currentX = -setOption.initialIndex * this.itemWidth;
+    this.currentX = setOption.initialIndex * this.itemWidth;
     this.handleChange();
   }
 
@@ -63,7 +63,7 @@ export class Slider {
   public update(x: number) {
     const moveOffset = this.deltaMove - x;
     this.deltaTime = this.deltaTime - performance.now();
-    this.currentX -= moveOffset;
+    this.currentX += moveOffset;
     this.updateLocation();
     this.handleChange();
     this.speedCalc.add(moveOffset / this.deltaTime * 50);
@@ -73,20 +73,18 @@ export class Slider {
   }
 
   public handleChange() {
-    const position = this.currentX;
+    const position = this.currentX + this.offsetLeft + (this.itemWidth * this.copyElementNum);
     const index = Math.floor(Math.abs(this.currentX) / this.itemWidth) % (this.elementNum + this.copyElementNum * 2);
-    this.onChange && this.onChange(position - this.offsetLeft, index);
+    this.onChange && this.onChange(position, index);
   }
   // ロケーションのアップデート
   public updateLocation() {
     const maxLength = this.itemWidth * this.elementNum;
     if (this.isLoop) {
-      if (this.currentX > 0) {
-        this.currentX %= maxLength;
+      if (this.currentX < 0) {
+        this.currentX = maxLength;
       }
-      if (this.currentX < maxLength) {
-        this.currentX %= maxLength;
-      }
+      this.currentX %= maxLength + 1;
     } else {
       if (this.currentX > -1) {
           this.currentX = 0;
@@ -161,16 +159,15 @@ export class Slider {
     let deltaTime = 0;
     let elapsedTime = 0;
     const position = this.currentX;
-    const speed = this.speed * 10 * -1;
+    const speed = this.speed * 10;
     const movementPosition = this.isFit ? (
-        speed
-          - (speed % this.itemWidth)
-          - (position % this.itemWidth)
+        speed - ((position % this.itemWidth) + (speed % this.itemWidth))
       ) : speed;
-    const maxTime = Math.max(Math.abs(speed / 5), 200); // 速度の算出（最低２００ｍｓ）
+
+    const maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
     const tick = (time: number) => {
       if (elapsedTime > maxTime) {
-        this.currentX = position - movementPosition;
+        this.currentX = position + movementPosition;
         this.updateLocation();
         this.handleChange();
         this.onEnd && this.onEnd();
@@ -180,7 +177,7 @@ export class Slider {
       elapsedTime += deltaTime;
       const offsetPosition = Math.sin((elapsedTime / maxTime) * (Math.PI / 2))
       const movement = offsetPosition * movementPosition;
-      this.currentX = position - movement;
+      this.currentX = position + movement;
       this.updateLocation();
       this.handleChange();
       deltaTime = time;

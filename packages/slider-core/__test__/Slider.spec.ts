@@ -9,36 +9,35 @@ describe('increments value on click', () => {
   const elementNum = 5;
   const dummyNum = 2;
   const width = itemWidth * (elementNum + dummyNum * 2);
-  const offset = -(itemWidth * dummyNum);
-
+  const copyOffset = dummyNum * itemWidth; // コピーした分のズレ
 
   useSpyRequestAnimationFrame();
   useSpyPerformanceNow();
 
-  it('offset test', () => {
+  it('初期位置のズレテスト', () => {
     const instance = new Slider();
     instance.onChange = (x, index) => {
       expect(index).toBe(0);
-      expect(x).toBe(10 + offset);
+      expect(x).toBe(10 + copyOffset);
     };
     instance.init(width, elementNum, dummyNum, {
       offsetLeft: 10,
     });
   });
 
-  it('initial index test', () => {
+  it('Index位置のズレによるテスト', () => {
     const instance = new Slider();
     const offsetIndex = 1;
     instance.onChange = (x, index) => {
       expect(index).toBe(1);
-      expect(x).toBe(-itemWidth + offset);
+      expect(x).toBe(itemWidth * offsetIndex + copyOffset);
     };
     instance.init(width, elementNum, dummyNum, {
       initialIndex: offsetIndex,
     });
   });
 
-  it('fitting loop test', async () => {
+  it('ループのテスト', async () => {
     const width = itemWidth * (elementNum + dummyNum * 2)
     const instance = new Slider();
     instance.init(width, elementNum, dummyNum, {
@@ -51,21 +50,11 @@ describe('increments value on click', () => {
       rx = x;
       ri = index;
     };
-
     instance.start(5);
     instance.update(-100);
     instance.update(-200);
-
     instance.onEnd = () => {
-      expect(rx).toBe(-ri * itemWidth + offset);
-    };
-    instance.end();
-
-    instance.start(5);
-    instance.update(-500);
-    instance.update(-1000);
-    instance.onEnd = () => {
-      expect(rx).toBe(-ri * itemWidth + offset);
+      expect(rx).toBe(ri * itemWidth + copyOffset);
     };
     instance.end();
   });
