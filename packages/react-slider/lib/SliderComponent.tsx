@@ -19,22 +19,10 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   const refIndex = React.useRef(0)
   const sliderInstance = React.useMemo<Slider>(() =>  new Slider(), []);
 
-  // events
-  React.useEffect(() => {
-    if (refWrap.current == null) return;
-    sliderInstance.onChange = (x, index) => {
-      if (refWrap.current == null) return;
-      refWrap.current.style.transform = `translateX(${x}px)`;
-      refWrap.current.style.webkitTransform = `translateX(${x}px)`;
-
-      if (refIndex.current === index) return;
-      refIndex.current = index;
-      onChangeIndex && onChangeIndex(index);
-    };
-  }, []);
-
   // event listeners
   const handleStart = React.useCallback((x: number) => {
+
+    sliderInstance.start(x);
 
     // update event
     const mouseMoveHandler = (e: MouseEvent) => sliderInstance.update(e.pageX);
@@ -62,8 +50,18 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   const handleTouchStart: React.TouchEventHandler<HTMLElement> = React.useCallback((e) => handleStart(e.touches[0].pageX), []);
 
   // initialization
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (refWrap.current == null) return;
+    sliderInstance.onChange = (x, index) => {
+      if (refWrap.current == null) return;
+      refWrap.current.style.transform = `translateX(${x}px)`;
+      refWrap.current.style.webkitTransform = `translateX(${x}px)`;
+
+      if (refIndex.current === index) return;
+      refIndex.current = index;
+      onChangeIndex && onChangeIndex(index);
+    };
+
     sliderInstance.init(refWrap.current.scrollWidth, components.length, copyNum, {
       isFit,
       isLoop,

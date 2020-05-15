@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@araki-packages/react-slider@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@araki-packages/react-slider/-/react-slider-0.0.1.tgz#e6d32cbd295cf3db432c82305737aaafdd3796f1"
-  integrity sha512-deOR2fqA5JyO0akx842iisw1kLqHZ4CG6dn27z7kbx1g37v2C0a07RJ/XxDXgWU4vEC56diEzzuCcpWSb19KBg==
+"@araki-packages/react-slider@^0.0.4":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@araki-packages/react-slider/-/react-slider-0.0.2.tgz#8a9ab38f851a4f79a3ecb4b76681472e0fcfc304"
+  integrity sha512-ZGR3Zv/4e9aptVZXqhrnZgwpjRlLZN4oIvCMS/pDrTzycu03Z/y3XTFI67lYv18dcVbFWERBaC53TgZH/P1P3Q==
   dependencies:
     "@araki-packages/slider-core" "^0.0.4"
 

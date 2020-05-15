@@ -18,43 +18,21 @@ const createMockImageUrl = (seed) => {
 const ImageComponent = (seed) => {
   return <img src={createMockImageUrl(seed)}/>
 }
-
-const Test = () => {
-  const refWrap = React.useRef(null);
-  return (
-    <div style={{
-        maxWidth: '100%',
-        width: '100%',
-        overflowX: 'hidden',
-        msOverflowX: 'hidden',
-    }}>
-      <div
-        ref={refWrap}
-        style={{
-          display: 'inline-flex',
-        }}>
-      </div>
-    </div>
-  )
-
-}
-
 const ImageSlider = () => {
   console.log(new Slider());
   const Components = React.useMemo(() => {
     return [
-      <ImageComponent seed={1000}/>,
-      <ImageComponent seed={1000}/>,
-      <ImageComponent seed={1000}/>,
-      <ImageComponent seed={1000}/>,
-      <ImageComponent seed={2000}/>,
-      <ImageComponent seed={3000}/>,
-      <ImageComponent seed={4000}/>,
+      <ImageComponent seed={0xFFFFFF}/>,
+      <ImageComponent seed={0xAAAAAA}/>,
+      <ImageComponent seed={0xDDDDDD}/>,
+      <ImageComponent seed={0x000000}/>,
+      <ImageComponent seed={0x444444}/>,
+      <ImageComponent seed={0xAAAAAA}/>,
+      <ImageComponent seed={0xbbbbbb}/>,
     ];
   });
   return (
     <>
-      <Test />
       <SliderComponent
         components={Components}
         copyNum={3}
