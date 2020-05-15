@@ -74,6 +74,7 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   return (
     <div style={{
         maxWidth: '100%',
+        width: '100%',
         overflowX: 'hidden',
         msOverflowX: 'hidden',
     }}>
