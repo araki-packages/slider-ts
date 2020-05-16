@@ -84,13 +84,13 @@ export class Slider {
       if (this.currentX < 0) {
         this.currentX = maxLength + (this.currentX % maxLength);
       }
-      this.currentX %= maxLength + 1;
+      this.currentX %= maxLength;
     } else {
-      if (this.currentX > -1) {
+      if (this.currentX < 0) {
           this.currentX = 0;
       }
-      if (this.currentX < maxLength * -1) {
-          this.currentX = maxLength * -1;
+      if (this.currentX > maxLength) {
+          this.currentX = maxLength;
       }
     }
   }

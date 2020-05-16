@@ -44,13 +44,9 @@ describe('increments value on click', () => {
     });
   });
 
-  it('ループのテスト', async () => {
+  it('ループのテスト:スナップショット', async () => {
     const width = itemWidth * (elementNum + dummyNum * 2)
     const instance = new Slider();
-    instance.init(width, elementNum, dummyNum, {
-      isFit: true,
-      isLoop: true,
-    });
     let rx = 0;
     let ri = 0;
     const logList: {x: number, i: number}[] = [];
@@ -60,6 +56,10 @@ describe('increments value on click', () => {
       rx = x;
       ri = i;
     };
+    instance.init(width, elementNum, dummyNum, {
+      isFit: true,
+      isLoop: true,
+    });
     instance.start(5);
     instance.update(-100);
     instance.update(-400);
@@ -68,5 +68,40 @@ describe('increments value on click', () => {
       expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
     };
     instance.end();
+  });
+
+  it('しきい値テスト', async () => {
+    const width = itemWidth * (elementNum + dummyNum * 2)
+    const instance = new Slider();
+    let rx = 0;
+    let ri = 0;
+    const logList: {x: number, i: number}[] = [];
+
+    instance.onChange = (x, i) => {
+      logList.push({x, i});
+      rx = x;
+      ri = i;
+      expect(x).toBeGreaterThanOrEqual(copyOffset);
+      expect(x).toBeLessThanOrEqual(elementNum * itemWidth + copyOffset + 1);
+    };
+    instance.init(width, elementNum, dummyNum, {
+      isLoop: true,
+    });
+    const updateLoaction = () => {
+      instance.start(5);
+      instance.update(-100);
+      instance.update(-400);
+      instance.end();
+      instance.start(5);
+      instance.update(100);
+      instance.update(400);
+      instance.end();
+    };
+    updateLoaction();
+    instance.init(width, elementNum, dummyNum, {
+      isLoop: false,
+    });
+    updateLoaction();
+
   });
 });
