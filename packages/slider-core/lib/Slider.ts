@@ -14,7 +14,6 @@ export class Slider {
   private itemWidth!: number;
   private deltaTime = 0; // 時間の差分
   private deltaMove = 0; // updateの移動値の差分
-  private movementPosition: number = 0;
 
   private animationID?: number;
   public onChange?: (x: number, index: number) => void; // changeEvent
@@ -49,7 +48,6 @@ export class Slider {
   public start(x: number) {
     cancelAnimationFrame(this.animationID || 0);
     this.deltaMove = x;
-    this.movementPosition = 0;
     this.speedCalc.reset();
   }
 
@@ -61,15 +59,13 @@ export class Slider {
     this.updateLocation();
     this.handleChange();
     this.speedCalc.add(moveOffset / this.deltaTime * 50);
-    this.movementPosition += moveOffset;
     this.deltaTime = performance.now();
     this.deltaMove = x;
   }
 
   public handleChange() {
-    const position = this.currentX;
     const index = Math.round(this.currentX / this.itemWidth);
-    this.onChange && this.onChange(position, index);
+    this.onChange && this.onChange(this.currentX, index);
   }
   // ロケーションのアップデート
   public updateLocation() {
@@ -96,66 +92,11 @@ export class Slider {
   // タッチイベント終了時
   public end() {
     this.speed = this.speedCalc.get();
-
     const speed = this.speed * 10;
     let movementPosition = this.isFit ? (
         speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
       ) : speed;
     let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
-
-    // 一定以上のスピードの場合は感性スクロールをオンにする。
-    if (this.speed > 200) {
-      this.moveTo(movementPosition, maxTime);
-      return;
-    }
-    // 決め打ちアニメーション
-    if (this.movementPosition < this.itemWidth / 6 && this.movementPosition > 0) {
-      this.speed = this.itemWidth / 8;
-      let movementPosition = this.isFit ? (
-          speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
-        ) : speed;
-      let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
-      this.moveTo(movementPosition, maxTime);
-      return;
-    }
-    if (this.movementPosition > -this.itemWidth / 6 && this.movementPosition < 0) {
-      this.speed = 0;
-      let movementPosition = this.isFit ? (
-          speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
-        ) : speed;
-      let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
-      this.moveTo(movementPosition, maxTime);
-      return;
-    }
-    if (this.movementPosition < this.itemWidth / 2 && this.movementPosition > 0) {
-      this.prev();
-      return;
-    }
-    if (this.movementPosition > -this.itemWidth && this.movementPosition < 0) {
-      this.next();
-      return;
-    }
-
-    // 動作が1未満の場合はストップ
-    if (Math.abs(this.movementPosition) < 5) {
-      // TODO: 中途半端な場所の場合は、変更する。
-      // TODO 場当たり的な処理のため後日原因を探し、修正を行う。
-      // setTimeout(() => {
-      //   this.next();
-      // }, 100);
-      return;
-    }
-
-    // 速さが1未満の場合はストップ
-    if (Math.abs(this.speed) < 5) {
-      this.speed = 0;
-      let movementPosition = this.isFit ? (
-          speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
-        ) : speed;
-      let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
-      this.moveTo(movementPosition, maxTime);
-      return;
-    }
     this.moveTo(movementPosition, maxTime);
   }
 

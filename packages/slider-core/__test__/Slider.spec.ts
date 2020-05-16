@@ -22,7 +22,7 @@ class SliderLogger {
 
 const itemWidth = 100;
 const elementNum = 5;
-const width = itemWidth * elementNum;
+const initialWidth = itemWidth * elementNum;
 const maxWidth = itemWidth * elementNum;
 useSpyRequestAnimationFrame();
 useSpyPerformanceNow();
@@ -37,7 +37,7 @@ describe('基本動作テスト', () => {
       expect(index).toBe(1);
       expect(x).toBe(itemWidth * offsetIndex);
     };
-    instance.init(width, elementNum, {
+    instance.init(initialWidth, elementNum, {
       initialIndex: offsetIndex,
     });
   });
@@ -76,7 +76,6 @@ describe('基本動作テスト', () => {
   });
 
   it('非ループのテスト:スナップショット', () => {
-    const width = itemWidth * elementNum;
     const instance = new Slider();
     let rx = 0;
     let ri = 0;
@@ -87,7 +86,7 @@ describe('基本動作テスト', () => {
       rx = x;
       ri = i;
     };
-    instance.init(width, elementNum, {
+    instance.init(initialWidth, elementNum, {
       isFit: true,
       isLoop: false,
     });
@@ -96,6 +95,7 @@ describe('基本動作テスト', () => {
       expect(logList.toCSV()).toMatchSnapshot();
       logList.clear();
     };
+
     instance.start(5);
     instance.update(-50);
     instance.update(-100);
@@ -108,7 +108,6 @@ describe('基本動作テスト', () => {
   });
 
   it('限界値テスト', () => {
-    const width = itemWidth;
     const instance = new Slider();
     let rx = 0;
     let ri = 0;
@@ -121,7 +120,7 @@ describe('基本動作テスト', () => {
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(elementNum * itemWidth);
     };
-    instance.init(width, elementNum, {
+    instance.init(initialWidth, elementNum, {
       isLoop: true,
     });
     const updateLoaction = () => {
@@ -135,14 +134,13 @@ describe('基本動作テスト', () => {
       instance.end();
     };
     updateLoaction();
-    instance.init(width, elementNum, {
+    instance.init(initialWidth, elementNum, {
       isLoop: false,
     });
     updateLoaction();
   });
 
   it('非ループ値限界値テスト', () => {
-    const width = itemWidth;
     const instance = new Slider();
     let rx = 0;
     let ri = 0;
@@ -153,7 +151,7 @@ describe('基本動作テスト', () => {
       rx = x;
       ri = i;
     };
-    instance.init(width, elementNum, {
+    instance.init(initialWidth, elementNum, {
       isLoop: false,
     });
 
@@ -161,19 +159,24 @@ describe('基本動作テスト', () => {
       expect(rx).toBe(maxWidth);
     }
     instance.start(5);
-    instance.update(10);
-    instance.update(300);
+    instance.update(25);
+    instance.update(50);
+    instance.update(75);
     instance.end();
 
-    // instance.start(5);
-    // instance.update(-50);
-    // instance.update(-100);
-    // instance.end();
+    instance.onEnd = () => {
+      expect(rx).toBe(0);
+    }
+    instance.start(0);
+    instance.update(-25);
+    instance.update(-50);
+    instance.update(-75);
+    instance.end();
   });
 
   it('インデックス移動テスト', () => {
     const instance = new Slider();
-    instance.init(width, elementNum);
+    instance.init(initialWidth, elementNum);
     const testIndex = (index: number) => {
       let rx = 0;
       let ri = 0;
