@@ -8,6 +8,7 @@ const main = async (...args) => {
      buildTask(package, 'cjs'),
      buildTask(package, 'esm'),
      buildTask(package, 'dts'),
+     buildTask(package, 'iife'),
   ]);
 };
 main(...process.argv);
