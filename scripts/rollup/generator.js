@@ -63,7 +63,7 @@ const generateRollupESM = (options)  => ({
   input: base(options),
   output: {
     file: path.resolve(path.dirname(options.input), 'dist', 'index.esm.js'),
-    format: 'es',
+    format: 'esm',
   }
 });
 
