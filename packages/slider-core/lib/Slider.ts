@@ -82,7 +82,7 @@ export class Slider {
     const maxLength = this.itemWidth * this.elementNum;
     if (this.isLoop) {
       if (this.currentX < 0) {
-        this.currentX = maxLength;
+        this.currentX = maxLength + (this.currentX % maxLength);
       }
       this.currentX %= maxLength + 1;
     } else {
@@ -98,20 +98,35 @@ export class Slider {
   // タッチイベント終了時
   public end() {
     this.speed = this.speedCalc.get();
+
+    const speed = this.speed * 10;
+    let movementPosition = this.isFit ? (
+        speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
+      ) : speed;
+    let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
+
     // 一定以上のスピードの場合は感性スクロールをオンにする。
     if (this.speed > 200) {
-      this.decraition();
+      this.decraition(movementPosition, maxTime);
       return;
     }
     // 決め打ちアニメーション
     if (this.movementPosition < this.itemWidth / 6 && this.movementPosition > 0) {
       this.speed = this.itemWidth / 8;
-      this.decraition();
+      let movementPosition = this.isFit ? (
+          speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
+        ) : speed;
+      let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
+      this.decraition(movementPosition, maxTime);
       return;
     }
     if (this.movementPosition > -this.itemWidth / 6 && this.movementPosition < 0) {
       this.speed = 0;
-      this.decraition();
+      let movementPosition = this.isFit ? (
+          speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
+        ) : speed;
+      let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
+      this.decraition(movementPosition, maxTime);
       return;
     }
     if (this.movementPosition < this.itemWidth / 2 && this.movementPosition > 0) {
@@ -136,35 +151,33 @@ export class Slider {
     // 速さが1未満の場合はストップ
     if (Math.abs(this.speed) < 5) {
       this.speed = 0;
-      this.decraition();
+      let movementPosition = this.isFit ? (
+          speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
+        ) : speed;
+      let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
+      this.decraition(movementPosition, maxTime);
       return;
     }
-    this.decraition();
+    this.decraition(movementPosition, maxTime);
   }
 
   // 次のスライド
   public next() {
     this.speed = this.itemWidth / 8;
-    this.decraition();
+    this.decraition(this.itemWidth, 100);
   }
 
   // 前のスライド
   public prev() {
     this.speed = -this.itemWidth / 16;
-    this.decraition();
+    this.decraition(-this.itemWidth, 100);
   }
 
   // 慣性スクロール
-  private decraition() {
+  private decraition(movementPosition: number, maxTime: number) {
     let deltaTime = 0;
     let elapsedTime = 0;
     const position = this.currentX;
-    const speed = this.speed * 10;
-    const movementPosition = this.isFit ? (
-        speed - ((position % this.itemWidth) + (speed % this.itemWidth))
-      ) : speed;
-
-    const maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
     const tick = (time: number) => {
       if (elapsedTime > maxTime) {
         this.currentX = position + movementPosition;

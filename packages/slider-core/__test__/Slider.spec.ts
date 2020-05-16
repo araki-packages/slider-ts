@@ -1,5 +1,12 @@
+import path from 'path';
+
 import { Slider } from '../lib/Slider'
 import { useSpyRequestAnimationFrame, useSpyPerformanceNow } from './util/index';
+
+const LOG_DIR = path.resolve(__dirname, 'SliderLog');
+const LOG_FILE = {
+  MOVEMENT_DIFF: path.resolve(LOG_DIR, 'movement_diff.json')
+}
 
 requestAnimationFrame(() => {
   console.log('hoge');
@@ -46,15 +53,19 @@ describe('increments value on click', () => {
     });
     let rx = 0;
     let ri = 0;
-    instance.onChange = (x, index) => {
+    const logList: {x: number, i: number}[] = [];
+
+    instance.onChange = (x, i) => {
+      logList.push({x, i});
       rx = x;
-      ri = index;
+      ri = i;
     };
     instance.start(5);
     instance.update(-100);
-    instance.update(-200);
-    instance.onEnd = () => {
+    instance.update(-400);
+    instance.onEnd = async () => {
       expect(rx).toBe(ri * itemWidth + copyOffset);
+      expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
     };
     instance.end();
   });

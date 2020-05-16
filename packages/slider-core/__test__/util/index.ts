@@ -1,5 +1,5 @@
 
-let oneFrameAtMS = 1000 / 60;
+let oneFrameAtMS = 1000 / 120;
 export const useSpyRequestAnimationFrame = () => {
   beforeEach(() => {
     let i = 0;
@@ -11,9 +11,10 @@ export const useSpyRequestAnimationFrame = () => {
       });
   });
 };
+
 export const useSpyPerformanceNow = () => {
   beforeEach(() => {
-    let i = 0;
+    let i = 100;
     jest.spyOn(window.performance, 'now')
       .mockImplementation(() => {
         i += oneFrameAtMS;

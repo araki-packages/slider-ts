@@ -4,6 +4,13 @@
   "main": "dist/index.esm.js",
   "module": "dist/index.cjs.js",
   "types": "dist/index.d.ts",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "example": "webpack-dev-server",
+    "example:build": "webpack",
+    "test": "jest",
+    "test:update": "jest --updateSnapshot"
+  },
   "files": [
     "LICENSE",
     "README.md",
