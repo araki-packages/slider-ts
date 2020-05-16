@@ -1,14 +1,11 @@
 import { SpeedCalculator } from './SpeedCalculator';
 import { SliderOptions } from '../interfaces/lib/common';
 import { InitialSliderOptions } from '../constants/lib/common';
-import { isThisTypeNode } from 'typescript';
 
 export class Slider {
   private width!: number; // 全体の長さ
   private isLoop!: boolean; // ループするかどうか
   private isFit!: boolean;
-  private copyElementNum!: number; // コピーした画像数
-  private offsetLeft!: number;
   private currentX = 0; // 現在の位置情報
   private elementNum = 0; // 総エレメント巣
   private speed: number = 0;
@@ -36,16 +33,13 @@ export class Slider {
   public init(
     width: number,
     viewElementNum: number,
-    copyElementNum: number,
     options?: SliderOptions,
   ) {
     const setOption = {...InitialSliderOptions, ...options};
     this.width = width;
     this.elementNum = viewElementNum;
-    this.copyElementNum = copyElementNum;
-    this.itemWidth = this.width / (this.elementNum + this.copyElementNum * 2);
+    this.itemWidth = this.width / this.elementNum;
     this.isLoop = setOption.isLoop;
-    this.offsetLeft = setOption.offsetLeft;
     this.isFit = setOption.isFit;
     this.currentX = setOption.initialIndex * this.itemWidth;
     this.handleChange();
@@ -73,7 +67,7 @@ export class Slider {
   }
 
   public handleChange() {
-    const position = this.currentX + this.offsetLeft + (this.itemWidth * this.copyElementNum);
+    const position = this.currentX;
     const index = Math.round(this.currentX / this.itemWidth);
     this.onChange && this.onChange(position, index);
   }
@@ -83,14 +77,18 @@ export class Slider {
     if (this.isLoop) {
       if (this.currentX < 0) {
         this.currentX = maxLength + (this.currentX % maxLength);
+        return;
       }
       this.currentX %= maxLength;
+      return;
     } else {
       if (this.currentX < 0) {
           this.currentX = 0;
+          return;
       }
       if (this.currentX > maxLength) {
           this.currentX = maxLength;
+          return;
       }
     }
   }

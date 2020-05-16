@@ -1,103 +1,106 @@
 import { Slider } from '../lib/Slider'
 import { useSpyRequestAnimationFrame, useSpyPerformanceNow } from './util/index';
 
+class SliderLogger {
+  private list: {x: number, i: number}[] = [];
+  constructor() {
+  }
+
+  public add (x: number, i: number) {
+    this.list.push({x, i});
+  }
+
+  public clear() {
+    this.list = [];
+  }
+  public toCSV(): string {
+    const table = '\'position\', \'index\'';
+    const record = this.list.map(({x, i}) => `${x}, ${i}`).join('\n');
+    return `${table}\n${record}`
+  }
+}
+
 const itemWidth = 100;
 const elementNum = 5;
-const dummyNum = 2;
-const width = itemWidth * (elementNum + dummyNum * 2);
-const copyOffset = dummyNum * itemWidth; // コピーした分のズレ
+const width = itemWidth * elementNum;
+const maxWidth = itemWidth * elementNum;
 useSpyRequestAnimationFrame();
 useSpyPerformanceNow();
 
 describe('基本動作テスト', () => {
 
-  it('offset初期位置ズレのテスト', () => {
-    const instance = new Slider();
-    instance.onChange = (x, index) => {
-      expect(index).toBe(0);
-      expect(x).toBe(10 + copyOffset);
-    };
-    instance.init(width, elementNum, dummyNum, {
-      offsetLeft: 10,
-    });
-  });
 
   it('Index初期位置ズレのテスト', () => {
     const instance = new Slider();
     const offsetIndex = 1;
     instance.onChange = (x, index) => {
       expect(index).toBe(1);
-      expect(x).toBe(itemWidth * offsetIndex + copyOffset);
+      expect(x).toBe(itemWidth * offsetIndex);
     };
-    instance.init(width, elementNum, dummyNum, {
+    instance.init(width, elementNum, {
       initialIndex: offsetIndex,
     });
   });
 
   it('ループのテスト:スナップショット', () => {
-    const width = itemWidth * (elementNum + dummyNum * 2)
+    const width = itemWidth * (elementNum)
     const instance = new Slider();
     let rx = 0;
     let ri = 0;
-    const logList: {x: number, i: number}[] = [];
+    let logList = new SliderLogger();
 
     instance.onChange = (x, i) => {
-      logList.push({x, i});
+      logList.add(x, i);
       rx = x;
       ri = i;
     };
-    instance.init(width, elementNum, dummyNum, {
+    instance.init(width, elementNum, {
       isFit: true,
       isLoop: true,
     });
+    instance.onEnd = () => {
+      expect(rx).toBe(ri * itemWidth);
+      expect(logList.toCSV()).toMatchSnapshot();
+      logList.clear();
+    };
+
     instance.start(5);
     instance.update(-100);
     instance.update(-400);
-    instance.onEnd = () => {
-      expect(rx).toBe(ri * itemWidth + copyOffset);
-      expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
-    };
     instance.end();
 
     instance.start(5);
     instance.update(100);
     instance.update(400);
-    instance.onEnd = () => {
-      expect(rx).toBe(ri * itemWidth + copyOffset);
-      expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
-    };
     instance.end();
   });
 
   it('非ループのテスト:スナップショット', () => {
-    const width = itemWidth * (elementNum + dummyNum * 2)
+    const width = itemWidth * elementNum;
     const instance = new Slider();
     let rx = 0;
     let ri = 0;
-    const logList: {x: number, i: number}[] = [];
+    const logList = new SliderLogger();
 
     instance.onChange = (x, i) => {
-      logList.push({x, i});
+      logList.add(x, i);
       rx = x;
       ri = i;
     };
-    instance.init(width, elementNum, dummyNum, {
+    instance.init(width, elementNum, {
       isFit: true,
       isLoop: false,
     });
     instance.onEnd = () => {
-      expect(rx).toBe(ri * itemWidth + copyOffset);
-      expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
+      expect(rx).toBe(ri * itemWidth);
+      expect(logList.toCSV()).toMatchSnapshot();
+      logList.clear();
     };
     instance.start(5);
     instance.update(-50);
     instance.update(-100);
     instance.end();
 
-    instance.onEnd = () => {
-      expect(rx).toBe(ri * itemWidth + copyOffset);
-      expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
-    };
     instance.start(5);
     instance.update(50);
     instance.update(100);
@@ -105,20 +108,20 @@ describe('基本動作テスト', () => {
   });
 
   it('限界値テスト', () => {
-    const width = itemWidth * (elementNum + dummyNum * 2)
+    const width = itemWidth;
     const instance = new Slider();
     let rx = 0;
     let ri = 0;
-    const logList: {x: number, i: number}[] = [];
+    const logList = new SliderLogger();
 
     instance.onChange = (x, i) => {
-      logList.push({x, i});
+      logList.add(x, i);
       rx = x;
       ri = i;
-      expect(x).toBeGreaterThanOrEqual(copyOffset);
-      expect(x).toBeLessThanOrEqual(elementNum * itemWidth + copyOffset + 1);
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(elementNum * itemWidth);
     };
-    instance.init(width, elementNum, dummyNum, {
+    instance.init(width, elementNum, {
       isLoop: true,
     });
     const updateLoaction = () => {
@@ -132,15 +135,45 @@ describe('基本動作テスト', () => {
       instance.end();
     };
     updateLoaction();
-    instance.init(width, elementNum, dummyNum, {
+    instance.init(width, elementNum, {
       isLoop: false,
     });
     updateLoaction();
   });
 
+  it('非ループ値限界値テスト', () => {
+    const width = itemWidth;
+    const instance = new Slider();
+    let rx = 0;
+    let ri = 0;
+    const logList: {x: number, i: number}[] = [];
+
+    instance.onChange = (x, i) => {
+      logList.push({x, i});
+      rx = x;
+      ri = i;
+    };
+    instance.init(width, elementNum, {
+      isLoop: false,
+    });
+
+    instance.onEnd = () => {
+      expect(rx).toBe(maxWidth);
+    }
+    instance.start(5);
+    instance.update(10);
+    instance.update(300);
+    instance.end();
+
+    // instance.start(5);
+    // instance.update(-50);
+    // instance.update(-100);
+    // instance.end();
+  });
+
   it('インデックス移動テスト', () => {
     const instance = new Slider();
-    instance.init(width, elementNum, dummyNum);
+    instance.init(width, elementNum);
     const testIndex = (index: number) => {
       let rx = 0;
       let ri = 0;
