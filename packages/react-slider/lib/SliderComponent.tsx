@@ -13,7 +13,6 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   copyNum,
   isFit,
   isLoop,
-  offsetLeft,
 }) => {
   const refWrap = React.useRef<HTMLDivElement>(null)
   const refIndex = React.useRef(0)
@@ -62,12 +61,11 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
       onChangeIndex && onChangeIndex(index);
     };
 
-    sliderInstance.init(refWrap.current.scrollWidth, components.length, copyNum, {
+    sliderInstance.init(refWrap.current.scrollWidth, components.length, {
       isFit,
       isLoop,
-      offsetLeft,
     });
-  }, [isFit, isLoop, offsetLeft, components]);
+  }, [isFit, isLoop, components]);
 
   return (
     <div style={{

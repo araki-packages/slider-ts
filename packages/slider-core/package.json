@@ -9,7 +9,8 @@
     "example": "webpack-dev-server",
     "example:build": "webpack",
     "test": "jest",
-    "test:update": "jest --updateSnapshot"
+    "test:update": "jest --updateSnapshot",
+    "test:type": "tsc index.ts --noEmit"
   },
   "files": [
     "LICENSE",
