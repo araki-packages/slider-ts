@@ -3,10 +3,10 @@ const resolve = require('@rollup/plugin-node-resolve');
 const typescript = require('@rollup/plugin-typescript');
 const dts = require('rollup-plugin-dts').default;
 const commonjs = require('@rollup/plugin-commonjs');
-const babel = require('@rollup/plugin-babel').babel;
 const C = require('../tasks/constants');
 const path = require('path');
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+const camelcase = require('camelcase');
 
 const generateAtTypesRollup = (options) => ({
   input:{
@@ -37,8 +37,8 @@ const base = (options) => ({
     resolve({ extensions }),
     typescript({
       tsconfig: path.resolve(C.PROJECT_ROOT, 'tsconfig.json'),
+      target: "es5"
     }),
-    babel({ extensions, include: ['src/**/*']}),
 
     commonjs(),
   ],
@@ -63,8 +63,10 @@ const generateRollupCJS = (options) => ({
 });
 
 const generateRollupIIFE = (options) => ({
-  input: base(options),
+  input: base({...options, ignoreNodeModules: false}),
   output: {
+    strict: false,
+    name: camelcase(options.packageName),
     file: path.resolve(path.dirname(options.input), 'dist', 'index.min.js'),
     format: 'iife',
   }
@@ -91,7 +93,7 @@ const buildProcess = async (package, type) => {
         return generateRollupESM({ input: entryFile, ignoreNodeModules: true });
       case 'iife':
         console.log('GENERATE IIFE');
-        return generateRollupIIFE({ input: entryFile, ignoreNodeModules: true });
+        return generateRollupIIFE({ input: entryFile, ignoreNodeModules: true, packageName: package });
       case 'cjs':
         console.log('GENERATE CJS');
         return generateRollupCJS({ input: entryFile, ignoreNodeModules: true });

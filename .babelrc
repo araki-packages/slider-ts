@@ -1,9 +1,21 @@
 {
   "presets": [
-    "@babel/env",
+    [
+      "@babel/env",
+      {
+        "targets": {
+          "browsers": "> 0.5%, ie >= 11"
+        },
+        "useBuiltIns": "usage",
+        "corejs": 3
+      }
+    ],
     "@babel/typescript"
   ],
   "plugins": [
+    ["@babel/plugin-transform-classes", {
+      "loose": true
+    }],
     "@babel/proposal-class-properties",
     "@babel/proposal-object-rest-spread"
   ]
