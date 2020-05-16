@@ -1,27 +1,17 @@
-import path from 'path';
-
 import { Slider } from '../lib/Slider'
 import { useSpyRequestAnimationFrame, useSpyPerformanceNow } from './util/index';
 
-const LOG_DIR = path.resolve(__dirname, 'SliderLog');
-const LOG_FILE = {
-  MOVEMENT_DIFF: path.resolve(LOG_DIR, 'movement_diff.json')
-}
+const itemWidth = 100;
+const elementNum = 5;
+const dummyNum = 2;
+const width = itemWidth * (elementNum + dummyNum * 2);
+const copyOffset = dummyNum * itemWidth; // コピーした分のズレ
+useSpyRequestAnimationFrame();
+useSpyPerformanceNow();
 
-requestAnimationFrame(() => {
-  console.log('hoge');
-})
-describe('increments value on click', () => {
-  const itemWidth = 100;
-  const elementNum = 5;
-  const dummyNum = 2;
-  const width = itemWidth * (elementNum + dummyNum * 2);
-  const copyOffset = dummyNum * itemWidth; // コピーした分のズレ
+describe('基本動作テスト', () => {
 
-  useSpyRequestAnimationFrame();
-  useSpyPerformanceNow();
-
-  it('初期位置のズレテスト', () => {
+  it('offset初期位置ズレのテスト', () => {
     const instance = new Slider();
     instance.onChange = (x, index) => {
       expect(index).toBe(0);
@@ -32,7 +22,7 @@ describe('increments value on click', () => {
     });
   });
 
-  it('Index位置のズレによるテスト', () => {
+  it('Index初期位置ズレのテスト', () => {
     const instance = new Slider();
     const offsetIndex = 1;
     instance.onChange = (x, index) => {
@@ -44,7 +34,7 @@ describe('increments value on click', () => {
     });
   });
 
-  it('ループのテスト:スナップショット', async () => {
+  it('ループのテスト:スナップショット', () => {
     const width = itemWidth * (elementNum + dummyNum * 2)
     const instance = new Slider();
     let rx = 0;
@@ -63,14 +53,58 @@ describe('increments value on click', () => {
     instance.start(5);
     instance.update(-100);
     instance.update(-400);
-    instance.onEnd = async () => {
+    instance.onEnd = () => {
+      expect(rx).toBe(ri * itemWidth + copyOffset);
+      expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
+    };
+    instance.end();
+
+    instance.start(5);
+    instance.update(100);
+    instance.update(400);
+    instance.onEnd = () => {
       expect(rx).toBe(ri * itemWidth + copyOffset);
       expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
     };
     instance.end();
   });
 
-  it('しきい値テスト', async () => {
+  it('非ループのテスト:スナップショット', () => {
+    const width = itemWidth * (elementNum + dummyNum * 2)
+    const instance = new Slider();
+    let rx = 0;
+    let ri = 0;
+    const logList: {x: number, i: number}[] = [];
+
+    instance.onChange = (x, i) => {
+      logList.push({x, i});
+      rx = x;
+      ri = i;
+    };
+    instance.init(width, elementNum, dummyNum, {
+      isFit: true,
+      isLoop: false,
+    });
+    instance.onEnd = () => {
+      expect(rx).toBe(ri * itemWidth + copyOffset);
+      expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
+    };
+    instance.start(5);
+    instance.update(-50);
+    instance.update(-100);
+    instance.end();
+
+    instance.onEnd = () => {
+      expect(rx).toBe(ri * itemWidth + copyOffset);
+      expect(JSON.stringify(logList, null, 2)).toMatchSnapshot();
+    };
+    instance.start(5);
+    instance.update(50);
+    instance.update(100);
+    instance.end();
+  });
+
+  it('限界値テスト', () => {
     const width = itemWidth * (elementNum + dummyNum * 2)
     const instance = new Slider();
     let rx = 0;
@@ -102,6 +136,33 @@ describe('increments value on click', () => {
       isLoop: false,
     });
     updateLoaction();
+  });
 
+  it('インデックス移動テスト', () => {
+    const instance = new Slider();
+    instance.init(width, elementNum, dummyNum);
+    const testIndex = (index: number) => {
+      let rx = 0;
+      let ri = 0;
+      instance.onChange = (x, i) => {
+        rx = x;
+        ri = i;
+      };
+      instance.onEnd = () => {
+        expect(ri).toBe(index);
+      };
+      instance.setIndex(index);
+    };
+    const testIndexList = [0,1,2,3,4,5];
+
+    testIndexList.sort(() => Math.random() - 0.5);
+    testIndexList.forEach((i) => {
+      testIndex(i);
+    });
+
+    testIndexList.sort(() => Math.random() - 0.5);
+    testIndexList.forEach((i) => {
+      testIndex(i);
+    })
   });
 });

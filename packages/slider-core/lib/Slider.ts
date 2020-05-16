@@ -74,7 +74,7 @@ export class Slider {
 
   public handleChange() {
     const position = this.currentX + this.offsetLeft + (this.itemWidth * this.copyElementNum);
-    const index = Math.floor(Math.abs(this.currentX) / this.itemWidth) % (this.elementNum + this.copyElementNum * 2);
+    const index = Math.round(this.currentX / this.itemWidth);
     this.onChange && this.onChange(position, index);
   }
   // ロケーションのアップデート
@@ -107,7 +107,7 @@ export class Slider {
 
     // 一定以上のスピードの場合は感性スクロールをオンにする。
     if (this.speed > 200) {
-      this.decraition(movementPosition, maxTime);
+      this.moveTo(movementPosition, maxTime);
       return;
     }
     // 決め打ちアニメーション
@@ -117,7 +117,7 @@ export class Slider {
           speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
         ) : speed;
       let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
-      this.decraition(movementPosition, maxTime);
+      this.moveTo(movementPosition, maxTime);
       return;
     }
     if (this.movementPosition > -this.itemWidth / 6 && this.movementPosition < 0) {
@@ -126,7 +126,7 @@ export class Slider {
           speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
         ) : speed;
       let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
-      this.decraition(movementPosition, maxTime);
+      this.moveTo(movementPosition, maxTime);
       return;
     }
     if (this.movementPosition < this.itemWidth / 2 && this.movementPosition > 0) {
@@ -155,26 +155,31 @@ export class Slider {
           speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
         ) : speed;
       let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
-      this.decraition(movementPosition, maxTime);
+      this.moveTo(movementPosition, maxTime);
       return;
     }
-    this.decraition(movementPosition, maxTime);
+    this.moveTo(movementPosition, maxTime);
   }
 
   // 次のスライド
-  public next() {
-    this.speed = this.itemWidth / 8;
-    this.decraition(this.itemWidth, 100);
+  public next(duration: number = 100) {
+    this.currentX % this.itemWidth - this.itemWidth
+    this.moveTo(this.itemWidth, duration);
   }
 
   // 前のスライド
-  public prev() {
-    this.speed = -this.itemWidth / 16;
-    this.decraition(-this.itemWidth, 100);
+  public prev(duration: number = 100) {
+    this.moveTo(-this.itemWidth, duration);
+  }
+
+  // TODO
+  public setIndex(index: number, duration: number = 1000) {
+    const target = (index) * this.itemWidth
+    this.moveTo(target - this.currentX, duration);
   }
 
   // 慣性スクロール
-  private decraition(movementPosition: number, maxTime: number) {
+  public moveTo(movementPosition: number, maxTime: number) {
     let deltaTime = 0;
     let elapsedTime = 0;
     const position = this.currentX;
