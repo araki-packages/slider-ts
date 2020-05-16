@@ -59,7 +59,6 @@ describe('基本動作テスト', () => {
       isLoop: true,
     });
     instance.onEnd = () => {
-      expect(rx).toBe(ri * itemWidth);
       expect(logList.toCSV()).toMatchSnapshot();
       logList.clear();
     };
@@ -156,7 +155,7 @@ describe('基本動作テスト', () => {
     });
 
     instance.onEnd = () => {
-      expect(rx).toBe(maxWidth);
+      expect(rx).toBe(0);
     }
     instance.start(5);
     instance.update(25);
@@ -165,7 +164,7 @@ describe('基本動作テスト', () => {
     instance.end();
 
     instance.onEnd = () => {
-      expect(rx).toBe(0);
+      expect(rx).toBe(maxWidth);
     }
     instance.start(0);
     instance.update(-25);
