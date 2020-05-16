@@ -8,7 +8,6 @@ export class Slider {
   private isFit!: boolean;
   private currentX = 0; // 現在の位置情報
   private elementNum = 0; // 総エレメント巣
-  private speed: number = 0;
   private speedCalc: SpeedCalculator;
 
   private itemWidth!: number;
@@ -91,8 +90,7 @@ export class Slider {
 
   // タッチイベント終了時
   public end() {
-    this.speed = this.speedCalc.get();
-    const speed = this.speed * 10;
+    const speed = this.speedCalc.get() * 5;
     let movementPosition = this.isFit ? (
         speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
       ) : speed;
@@ -124,7 +122,7 @@ export class Slider {
     const position = this.currentX;
     const tick = (time: number) => {
       if (elapsedTime > maxTime) {
-        this.currentX = position + movementPosition;
+        this.currentX = position - movementPosition;
         this.updateLocation();
         this.handleChange();
         this.onEnd && this.onEnd();
@@ -134,7 +132,7 @@ export class Slider {
       elapsedTime += deltaTime;
       const offsetPosition = Math.sin((elapsedTime / maxTime) * (Math.PI / 2))
       const movement = offsetPosition * movementPosition;
-      this.currentX = position + movement;
+      this.currentX = position - movement;
       this.updateLocation();
       this.handleChange();
       deltaTime = time;
@@ -144,9 +142,8 @@ export class Slider {
     }
 
     this.animationID = window.requestAnimationFrame((time: number) => {
+      window.requestAnimationFrame(tick);
       deltaTime = time;
-      tick(time);
     });
-
   }
 }
