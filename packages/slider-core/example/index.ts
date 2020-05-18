@@ -1,9 +1,13 @@
+import { Slider } from '../index';
+import Chart from 'chart.js';
+
 const test = () => {
-  const slider = new sliderCore.Slider(5);
-  const list = [];
+  const slider = new Slider(5);
+  const list: {x: number, y: number}[] = [];
 
   let startTime = 0;
   const elTest = document.getElementById('hoge');
+  if (elTest == null) return;
   slider.init(elTest.scrollWidth, 5, {
     isLoop: true,
     isFit: false,
@@ -15,6 +19,7 @@ const test = () => {
   slider.onEnd = () => {
     console.log(list[list.length - 1]);
     const ctx = canvas.getContext('2d');
+    if (ctx == null) return;
     new Chart(ctx, {
       type: 'line',
       data: {
@@ -35,7 +40,7 @@ const test = () => {
   };
 
 
-  const move = (offset, duration) => {
+  const move = (offset: number, duration: number) => {
     return new Promise((r) => {
       setTimeout(() => {
         slider.update(offset);
@@ -59,9 +64,10 @@ const test = () => {
 };
 
 const main = () => {
-  const slider = new sliderCore.Slider(5);
+  const slider = new Slider(5);
   const elTest = document.getElementById('fit');
 
+  if (elTest == null) return;
   const itemWidth = elTest.scrollWidth / 9;
   console.log(elTest.scrollWidth)
   slider.onChange = (x) => {

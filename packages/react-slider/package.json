@@ -9,6 +9,9 @@
     "README.md",
     "dist/"
   ],
+  "scripts": {
+    "start": "webpack-dev-server"
+  },
   "homepage": "https://github.com/araki-packages/slider-ts/wiki",
   "bugs": "https://github.com/araki-packages/slider-ts/issues",
   "repository": {

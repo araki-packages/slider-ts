@@ -6,8 +6,6 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server",
-    "example": "webpack-dev-server",
-    "example:build": "webpack",
     "test": "jest",
     "test:update": "jest --updateSnapshot",
     "test:type": "tsc index.ts --noEmit"
@@ -24,5 +22,9 @@
     "url": "https://github.com/araki-packages/slider-ts",
     "directory": "packages/slider-core"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chart.js": "^2.9.20",
+    "chart.js": "^2.9.3"
+  }
 }

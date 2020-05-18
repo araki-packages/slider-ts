@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   mode: 'development',
   entry: {
-    index: [path.resolve(__dirname, './example/index.tsx')],
+    index: [path.resolve(__dirname, './example/index.ts')],
   },
   output: {
     path: path.resolve(__dirname, './example/dist'),
@@ -40,7 +40,6 @@ module.exports = {
     hot: true,
     inline: true,
     overlay: true,
-    port: 4030,
-    historyApiFallback: true,
+    port: 4030
   },
 };

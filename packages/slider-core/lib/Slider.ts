@@ -9,6 +9,7 @@ export class Slider {
   private currentX = 0; // 現在の位置情報
   private elementNum = 0; // 総エレメント巣
   private speedCalc: SpeedCalculator;
+  private smooth: number = 0;
 
   private itemWidth!: number;
   private deltaTime = 0; // 時間の差分
@@ -28,6 +29,14 @@ export class Slider {
   }
 
   // 初期化イベント
+  /**
+   * @param width 描画範囲
+   * @param viewElementNum 描画範囲内のアイテム数
+   * @param options.isLoop
+   * @param options.isFit
+   * @param options.initialIndex
+   * @param options.smooth - 移動時のなめらかさ
+   */
   public init(
     width: number,
     viewElementNum: number,
@@ -35,6 +44,7 @@ export class Slider {
   ) {
     const setOption = {...InitialSliderOptions, ...options};
     this.width = width;
+    this.smooth = Math.max(setOption.smooth, 0.01);
     this.elementNum = viewElementNum;
     this.itemWidth = this.width / this.elementNum;
     this.isLoop = setOption.isLoop;
@@ -90,9 +100,9 @@ export class Slider {
 
   // タッチイベント終了時
   public end() {
-    const speed = this.speedCalc.get() * 10;
+    const speed = this.speedCalc.get() * 10 * this.smooth;
     const maxTime = Math.min(Math.max(Math.abs(speed), 100), 1000); // 速度の算出（最低２００ｍｓ）
-    this.moveTo(speed, maxTime);
+    this.moveTo(speed, maxTime * this.smooth);
   }
 
   // 次のスライド
@@ -121,8 +131,10 @@ export class Slider {
       // koko
       + (this.itemWidth - movementPosition % this.itemWidth))
       : movementPosition;
+
     let deltaTime = 0;
     let elapsedTime = 0;
+
     const position = this.currentX;
     const tick = (time: number) => {
       if (elapsedTime > maxTime) {
