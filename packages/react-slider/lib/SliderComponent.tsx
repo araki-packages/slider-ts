@@ -5,6 +5,7 @@ export type SliderComponentProps = {
   onChangeIndex?: (index: number) => void;
   components: React.ReactElement[];
   copyNum: number;
+  offsetLeft: number;
 } & SliderOptions;
 
 export const SliderComponent: React.SFC<SliderComponentProps> = ({
@@ -12,6 +13,7 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   components,
   copyNum,
   isFit,
+  offsetLeft,
   isLoop,
 }) => {
   const refWrap = React.useRef<HTMLDivElement>(null)
@@ -21,6 +23,7 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   // event listeners
   const handleStart = React.useCallback((x: number) => {
     sliderInstance.start(x);
+    console.log('handle start');
     // update event
     const mouseMoveHandler = (e: MouseEvent) => sliderInstance.update(e.pageX);
     const touchMoveHandler = (e: TouchEvent) => sliderInstance.update(e.touches[0].pageX);
@@ -51,17 +54,18 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   // initialization
   React.useLayoutEffect(() => {
     if (refWrap.current == null) return;
+    let elementWidth = refWrap.current.scrollWidth / (components.length + copyNum * 2);
     sliderInstance.onChange = (x, index) => {
       if (refWrap.current == null) return;
-      refWrap.current.style.transform = `translateX(${x}px)`;
-      refWrap.current.style.webkitTransform = `translateX(${x}px)`;
-
+      const left = offsetLeft || 0;
+      refWrap.current.style.transform = `translateX(${(x + left + (elementWidth * copyNum)) * -1}px)`;
+      refWrap.current.style.webkitTransform = `translateX(${(x + left + (elementWidth * copyNum)) * -1}px)`;
       if (refIndex.current === index) return;
       refIndex.current = index;
       onChangeIndex && onChangeIndex(index);
     };
 
-    sliderInstance.init(refWrap.current.scrollWidth, components.length, {
+    sliderInstance.init(elementWidth * components.length, components.length, {
       isFit,
       isLoop,
     });

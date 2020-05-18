@@ -23,8 +23,8 @@ export class Slider {
    * @param width
    * @param isLoop 無限ループさせるかどうか
    */
-  constructor() {
-    this.speedCalc = new SpeedCalculator(5);
+  constructor(caches: number = 10) {
+    this.speedCalc = new SpeedCalculator(caches);
   }
 
   // 初期化イベント
@@ -81,8 +81,8 @@ export class Slider {
           this.currentX = 0;
           return;
       }
-      if (this.currentX > maxLength) {
-          this.currentX = maxLength;
+      if (this.currentX > maxLength - this.itemWidth) {
+          this.currentX = maxLength - this.itemWidth;
           return;
       }
     }
@@ -90,12 +90,9 @@ export class Slider {
 
   // タッチイベント終了時
   public end() {
-    const speed = this.speedCalc.get() * 5;
-    let movementPosition = this.isFit ? (
-        speed - ((this.currentX % this.itemWidth) + (speed % this.itemWidth))
-      ) : speed;
-    let maxTime = Math.max(Math.abs(speed / 5), 100); // 速度の算出（最低２００ｍｓ）
-    this.moveTo(movementPosition, maxTime);
+    const speed = this.speedCalc.get() * 10;
+    const maxTime = Math.min(Math.max(Math.abs(speed), 100), 1000); // 速度の算出（最低２００ｍｓ）
+    this.moveTo(speed, maxTime);
   }
 
   // 次のスライド
@@ -117,12 +114,19 @@ export class Slider {
 
   // 慣性スクロール
   public moveTo(movementPosition: number, maxTime: number) {
+    // 最終到達地点が半分かそうじゃないかで分岐
+    const calcMovementPosition = this.isFit ? Math.floor(movementPosition
+      // koko
+      - (this.itemWidth - this.currentX % this.itemWidth)
+      // koko
+      + (this.itemWidth - movementPosition % this.itemWidth))
+      : movementPosition;
     let deltaTime = 0;
     let elapsedTime = 0;
     const position = this.currentX;
     const tick = (time: number) => {
       if (elapsedTime > maxTime) {
-        this.currentX = position - movementPosition;
+        this.currentX = position - calcMovementPosition;
         this.updateLocation();
         this.handleChange();
         this.onEnd && this.onEnd();
@@ -131,19 +135,17 @@ export class Slider {
       deltaTime = time - deltaTime;
       elapsedTime += deltaTime;
       const offsetPosition = Math.sin((elapsedTime / maxTime) * (Math.PI / 2))
-      const movement = offsetPosition * movementPosition;
+      const movement = offsetPosition * calcMovementPosition;
       this.currentX = position - movement;
       this.updateLocation();
       this.handleChange();
       deltaTime = time;
-      this.animationID = window.requestAnimationFrame((time) => {
-        tick(time)
-      });
+      this.animationID = window.requestAnimationFrame(tick);
     }
 
-    this.animationID = window.requestAnimationFrame((time: number) => {
-      window.requestAnimationFrame(tick);
+    requestAnimationFrame((time: number) => {
       deltaTime = time;
-    });
+      requestAnimationFrame(tick);
+    })
   }
 }

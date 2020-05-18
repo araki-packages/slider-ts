@@ -164,7 +164,7 @@ describe('基本動作テスト', () => {
     instance.end();
 
     instance.onEnd = () => {
-      expect(rx).toBe(maxWidth);
+      expect(rx).toBe(maxWidth - itemWidth);
     }
     instance.start(0);
     instance.update(-25);
