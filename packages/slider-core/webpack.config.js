@@ -8,7 +8,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, './example/dist'),
-    publicPath: './',
+    publicPath: '/',
     filename: '[name].js',
   },
   module: {
@@ -34,7 +34,6 @@ module.exports = {
     }),
   ],
   devServer: {
-    contentBase: './example/dist',
     host: '0.0.0.0',
     disableHostCheck: true,
     hot: true,

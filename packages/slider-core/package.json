@@ -25,6 +25,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/chart.js": "^2.9.20",
-    "chart.js": "^2.9.3"
+    "@types/dat.gui": "^0.7.5",
+    "chart.js": "^2.9.3",
+    "dat.gui": "^0.7.7"
   }
 }
