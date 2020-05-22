@@ -14,7 +14,7 @@ const test = () => {
     isFit: false,
   });
 
-  slider.onChange = (x, i) => {
+  slider.update = (x) => {
     list.push({y:x, x: performance.now() - startTime });
     elTest.style.transform = `translate(${x * -1}px)`;
   };

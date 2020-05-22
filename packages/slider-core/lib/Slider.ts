@@ -138,18 +138,19 @@ export class Slider {
       this.handleChange();
       deltaTime = time;
       this.rafToken = window.requestAnimationFrame(tick);
-    }
+    };
 
     requestAnimationFrame((time: number) => {
       deltaTime = time;
       requestAnimationFrame(tick);
-    })
+    });
   }
 
   private handleChange() {
     const index = Math.round(this.currentX / this.itemWidth);
     this.onChange && this.onChange(this.currentX, index);
   }
+
   // ロケーションのアップデート
   private updateLocation() {
     if (this.option.isLoop) {
