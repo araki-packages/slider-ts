@@ -1,22 +1,22 @@
-import { Slider } from '../lib/Slider'
-import { useSpyRequestAnimationFrame, useSpyPerformanceNow } from './util/index';
+import { Slider } from "../lib/Slider";
+import { useSpyRequestAnimationFrame, useSpyPerformanceNow } from "./util";
 
 class SliderLogger {
-  private list: {x: number, i: number}[] = [];
-  constructor() {
+  private list: Array<{ x: number; i: number }> = [];
+
+  public add(x: number, i: number): void {
+    this.list.push({ x, i });
   }
 
-  public add (x: number, i: number) {
-    this.list.push({x, i});
-  }
-
-  public clear() {
+  public clear(): void {
     this.list = [];
   }
+
   public toCSV(): string {
-    const table = '\'position\', \'index\'';
-    const record = this.list.map(({x, i}) => `${x}, ${i}`).join('\n');
-    return `${table}\n${record}`
+    const table = "'position', 'index'";
+    const record = this.list.map(({ x, i }) => `${x}, ${i}`).join("\n");
+
+    return `${table}\n${record}`;
   }
 }
 
@@ -27,10 +27,8 @@ const maxWidth = itemWidth * elementNum;
 useSpyRequestAnimationFrame();
 useSpyPerformanceNow();
 
-describe('基本動作テスト', () => {
-
-
-  it('Index初期位置ズレのテスト', () => {
+describe("基本動作テスト", () => {
+  it("Index初期位置ズレのテスト", () => {
     const instance = new Slider();
     const offsetIndex = 1;
     instance.onChange = (x, index) => {
@@ -42,18 +40,15 @@ describe('基本動作テスト', () => {
     });
   });
 
-  it('ループのテスト:スナップショット', () => {
-    const width = itemWidth * (elementNum)
+  it("ループのテスト:スナップショット", () => {
+    const width = itemWidth * elementNum;
     const instance = new Slider();
-    let rx = 0;
-    let ri = 0;
-    let logList = new SliderLogger();
+    const logList = new SliderLogger();
 
     instance.onChange = (x, i) => {
       logList.add(x, i);
-      rx = x;
-      ri = i;
     };
+
     instance.init(width, elementNum, {
       isFit: true,
       isLoop: true,
@@ -62,19 +57,17 @@ describe('基本動作テスト', () => {
       expect(logList.toCSV()).toMatchSnapshot();
       logList.clear();
     };
-
     instance.start(5);
     instance.update(-100);
     instance.update(-400);
     instance.end();
-
     instance.start(5);
     instance.update(100);
     instance.update(400);
     instance.end();
   });
 
-  it('非ループのテスト:スナップショット', () => {
+  it("非ループのテスト:スナップショット", () => {
     const instance = new Slider();
     let rx = 0;
     let ri = 0;
@@ -106,23 +99,19 @@ describe('基本動作テスト', () => {
     instance.end();
   });
 
-  it('限界値テスト', () => {
+  it("限界値テスト", () => {
     const instance = new Slider();
-    let rx = 0;
-    let ri = 0;
     const logList = new SliderLogger();
 
     instance.onChange = (x, i) => {
       logList.add(x, i);
-      rx = x;
-      ri = i;
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(elementNum * itemWidth);
     };
     instance.init(initialWidth, elementNum, {
       isLoop: true,
     });
-    const updateLoaction = () => {
+    const updateLocation = (): void => {
       instance.start(5);
       instance.update(-100);
       instance.update(-400);
@@ -132,23 +121,21 @@ describe('基本動作テスト', () => {
       instance.update(400);
       instance.end();
     };
-    updateLoaction();
+    updateLocation();
     instance.init(initialWidth, elementNum, {
       isLoop: false,
     });
-    updateLoaction();
+    updateLocation();
   });
 
-  it('非ループ値限界値テスト', () => {
+  it("非ループ値限界値テスト", () => {
     const instance = new Slider();
     let rx = 0;
-    let ri = 0;
-    const logList: {x: number, i: number}[] = [];
+    const logList: Array<{ x: number; i: number }> = [];
 
     instance.onChange = (x, i) => {
-      logList.push({x, i});
+      logList.push({ x, i });
       rx = x;
-      ri = i;
     };
     instance.init(initialWidth, elementNum, {
       isLoop: false,
@@ -156,7 +143,7 @@ describe('基本動作テスト', () => {
 
     instance.onEnd = () => {
       expect(rx).toBe(0);
-    }
+    };
     instance.start(5);
     instance.update(25);
     instance.update(50);
@@ -165,7 +152,7 @@ describe('基本動作テスト', () => {
 
     instance.onEnd = () => {
       expect(rx).toBe(maxWidth - itemWidth);
-    }
+    };
     instance.start(0);
     instance.update(-25);
     instance.update(-50);
@@ -173,14 +160,12 @@ describe('基本動作テスト', () => {
     instance.end();
   });
 
-  it('インデックス移動テスト', () => {
+  it("インデックス移動テスト", () => {
     const instance = new Slider();
     instance.init(initialWidth, elementNum);
-    const testIndex = (index: number) => {
-      let rx = 0;
+    const testIndex = (index: number): void => {
       let ri = 0;
       instance.onChange = (x, i) => {
-        rx = x;
         ri = i;
       };
       instance.onEnd = () => {
@@ -188,7 +173,7 @@ describe('基本動作テスト', () => {
       };
       instance.setIndex(index);
     };
-    const testIndexList = [0,1,2,3,4,5];
+    const testIndexList = [0, 1, 2, 3, 4, 5];
 
     testIndexList.sort(() => Math.random() - 0.5);
     testIndexList.forEach((i) => {
@@ -198,6 +183,6 @@ describe('基本動作テスト', () => {
     testIndexList.sort(() => Math.random() - 0.5);
     testIndexList.forEach((i) => {
       testIndex(i);
-    })
+    });
   });
 });

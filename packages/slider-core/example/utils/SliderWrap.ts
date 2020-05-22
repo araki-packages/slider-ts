@@ -1,14 +1,14 @@
-import { Slider } from '../../index';
+import { Slider } from "../..";
 
-export const main = () => {
+export const main = (): void => {
   const slider = new Slider(5);
-  const elTest = document.getElementById('fit');
+  const elTest = document.getElementById("fit");
 
   if (elTest == null) return;
   const itemWidth = elTest.scrollWidth / 9;
-  console.log(elTest.scrollWidth)
-  slider.onChange = (x) => {
-    elTest.style.transform = `translate(${(x * -1) + (itemWidth * -2)}px)`;
+  console.log(elTest.scrollWidth);
+  slider.update = (x) => {
+    elTest.style.transform = `translate(${x * -1 + itemWidth * -2}px)`;
   };
 
   console.log(itemWidth);
@@ -18,19 +18,19 @@ export const main = () => {
   });
 
   let isMouseDown = false;
-  elTest.addEventListener('mousedown', (e) => {
+  elTest.addEventListener("mousedown", (e) => {
     isMouseDown = true;
     slider.start(e.pageX);
-    console.log(e.pageX)
+    console.log(e.pageX);
   });
 
-  document.addEventListener('mousemove', (e) => {
+  document.addEventListener("mousemove", (e) => {
     if (isMouseDown) {
       slider.update(e.pageX);
     }
   });
 
-  document.addEventListener('mouseup', (e) => {
+  document.addEventListener("mouseup", () => {
     if (isMouseDown) {
       slider.end();
     }

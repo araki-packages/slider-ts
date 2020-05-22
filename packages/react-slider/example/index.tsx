@@ -1,15 +1,16 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { SliderComponent } from '../index';
+import { useMemo } from "react";
+import { render } from "react-dom";
+import { SliderComponent } from "..";
 
 const Main = () => {
-  const components = React.useMemo(() => [
+  const components = useMemo(
+    () => [
       <div
         key={1}
         style={{
-          width: '100vw',
+          width: "100vw",
           height: 100,
-          backgroundColor: '#FFF',
+          backgroundColor: "#FFF",
         }}
       >
         hoge
@@ -17,9 +18,9 @@ const Main = () => {
       <div
         key={2}
         style={{
-          width: '100vw',
+          width: "100vw",
           height: 100,
-          backgroundColor: '#AAA',
+          backgroundColor: "#AAA",
         }}
       >
         hoge
@@ -27,14 +28,17 @@ const Main = () => {
       <div
         key={3}
         style={{
-          width: '100vw',
+          width: "100vw",
           height: 100,
-          backgroundColor: '#555',
+          backgroundColor: "#555",
         }}
       >
         hoge
-      </div>
-  ], []);
+      </div>,
+    ],
+    []
+  );
+
   return (
     <div>
       <h1>hoge</h1>
@@ -45,14 +49,13 @@ const Main = () => {
         // isLoop
       />
     </div>
-  )
-}
+  );
+};
 
-ReactDOM.render((
+render(
   <div>
-    <h1>
-      hogehoge
-    </h1>
+    <h1>hogehoge</h1>
     <Main />
-  </div>
-), document.getElementById('app'));
+  </div>,
+  document.getElementById("app")
+);
