@@ -21,9 +21,16 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   const refIndex = React.useRef(0);
   const sliderInstance = React.useMemo<Slider>(() => new Slider(), []);
 
+  const handleWillChange = React.useCallback((isChange: boolean) => {
+    if (refWrap.current == null) return;
+    refWrap.current.style.willChange = isChange ? 'transform' : '';
+  }, []);
+
   // event listeners
   const handleStart = React.useCallback((x: number) => {
     sliderInstance.start(x);
+    handleWillChange(true);
+
     console.log("handle start");
     // update event
     const mouseMoveHandler = (e: MouseEvent): void => {
@@ -39,12 +46,14 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
     // end event
     const mouseUpHandler = (): void => {
       sliderInstance.end();
+      handleWillChange(false);
       window.removeEventListener("mousemove", mouseMoveHandler);
       window.removeEventListener("mouseup", mouseUpHandler);
     };
 
     const touchEndHandler = (): void => {
       sliderInstance.end();
+      handleWillChange(false);
       window.removeEventListener("touchmove", touchMoveHandler);
       window.removeEventListener("touchend", touchEndHandler);
     };

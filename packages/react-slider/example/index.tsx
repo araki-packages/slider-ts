@@ -10,9 +10,10 @@ const Main: React.SFC<{}> = () => {
       <div
         key={1}
         style={{
-          width: "100vw",
+          width: "50vw",
           height: 100,
-          backgroundColor: "#FFF",
+          backgroundColor: "#000",
+          color: "#FFF",
         }}
       >
         hoge
@@ -20,7 +21,7 @@ const Main: React.SFC<{}> = () => {
       <div
         key={2}
         style={{
-          width: "100vw",
+          width: "50vw",
           height: 100,
           backgroundColor: "#AAA",
         }}
@@ -30,7 +31,7 @@ const Main: React.SFC<{}> = () => {
       <div
         key={3}
         style={{
-          width: "100vw",
+          width: "50vw",
           height: 100,
           backgroundColor: "#555",
         }}
@@ -44,7 +45,17 @@ const Main: React.SFC<{}> = () => {
   return (
     <div>
       <h1>hoge</h1>
-      <SliderComponent components={components} offsetLeft={0} copyNum={1} />
+      <SliderComponent
+        components={components}
+        offsetLeft={0}
+        copyNum={0}
+        options={{
+          wrapperWidth: window.innerWidth / 2,
+          isFit: false,
+          isLoop: false,
+
+        }}
+      />
     </div>
   );
 };

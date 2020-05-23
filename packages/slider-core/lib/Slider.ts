@@ -182,7 +182,7 @@ export class Slider {
   private updateLocationIsNotLoop(): void {
     const maxLength = this.itemWidth * this.elementNum;
     const minPosition = 0;
-    const maxPosition = maxLength - this.itemWidth - this.option.wrapperWidth;
+    const maxPosition = maxLength - this.option.wrapperWidth;
     if (this.currentX < minPosition) {
       this.currentX = 0;
 
