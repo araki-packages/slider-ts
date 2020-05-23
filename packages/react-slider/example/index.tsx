@@ -45,12 +45,7 @@ const Main: React.SFC = () => {
   return (
     <div>
       <h1>hoge</h1>
-      <SliderComponent
-        components={components}
-        offsetLeft={0}
-        copyNum={1}
-        // isLoop
-      />
+      <SliderComponent components={components} offsetLeft={0} copyNum={1} />
     </div>
   );
 };
