@@ -2,11 +2,6 @@
 # yarn lockfile v1
 
 
-"@araki-packages/slider-core@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@araki-packages/slider-core/-/slider-core-0.0.4.tgz#def06c3784ff3531c3f4c415135d7201268e1e77"
-  integrity sha512-6i04v0XQGGKnGiq1q+g9TAsfkVU/0MWcDFw87mXHs91+7Pna4D8GxV842f6a/+D0x6XCZsEEQuvA7ZdZdQgSBw==
-
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.8.3":
   version "7.8.3"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.8.3.tgz#33e25903d7481181534e12ec0a25f16b6fcf419e"

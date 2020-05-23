@@ -1,13 +1,15 @@
+/** @jsx React.createElement */
 import React from "react";
 import { Slider } from "@araki-packages/slider-core";
-import { SliderOptions } from "../../slider-core/dist";
 
 export type SliderComponentProps = {
   onChangeIndex?: (index: number) => void;
   components: Array<React.ReactElement>;
   copyNum: number;
   offsetLeft: number;
-} & SliderOptions;
+  isFit?: boolean;
+  isLoop?: boolean;
+};
 
 export const SliderComponent: React.SFC<SliderComponentProps> = ({
   onChangeIndex,
@@ -67,6 +69,7 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
     if (refWrap.current == null) return;
     const elementWidth =
       refWrap.current.scrollWidth / (components.length + copyNum * 2);
+
     sliderInstance.onChange = (x, index) => {
       if (refWrap.current == null) return;
       const left = offsetLeft || 0;
@@ -81,7 +84,7 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
       onChangeIndex && onChangeIndex(index);
     };
 
-    sliderInstance.init(elementWidth * components.length, components.length, 4);
+    sliderInstance.init(elementWidth * components.length, components.length);
   }, [isFit, isLoop, components]);
 
   return (
