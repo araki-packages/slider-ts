@@ -1,11 +1,10 @@
-/** @jsx React.createElement */
 /* eslint-env node, mocha */
 /* eslint @typescript-eslint/no-unused-vars: 0 */
 import React from "react";
 import { render } from "react-dom";
 import { SliderComponent } from "..";
 
-const Main: React.SFC = () => {
+const Main: React.SFC<{}> = () => {
   const components = React.useMemo(
     () => [
       <div
