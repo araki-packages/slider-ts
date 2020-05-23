@@ -1,2 +1,4 @@
+import { Slider } from "./lib/Slider";
+
 export type { ISliderOptions } from "./interfaces/lib/common";
-export { Slider } from "./lib/Slider";
+export default Slider;

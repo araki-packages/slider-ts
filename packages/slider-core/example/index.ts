@@ -1,4 +1,4 @@
-import { Slider } from "..";
+import Slider from "..";
 import { CreateTestElement } from "./utils/TestElement";
 
 const test = (): void => {

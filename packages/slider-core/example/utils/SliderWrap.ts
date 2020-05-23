@@ -1,4 +1,4 @@
-import { Slider } from "../..";
+import Slider from "../..";
 
 export const main = (): void => {
   const slider = new Slider(5);

@@ -1,13 +1,13 @@
 /** @jsx React.createElement */
 import React from "react";
-import { Slider, ISliderOptions } from "@araki-packages/slider-core";
+import Slider, { ISliderOptions } from "@araki-packages/slider-core";
 
 export type SliderComponentProps = {
   onChangeIndex?: (index: number) => void;
   components: Array<React.ReactElement>;
   copyNum: number;
   offsetLeft: number;
-  option?: ISliderOptions;
+  options: ISliderOptions;
 };
 
 export const SliderComponent: React.SFC<SliderComponentProps> = ({
@@ -15,7 +15,6 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   components,
   copyNum,
   offsetLeft,
-  option,
 }) => {
   const refWrap = React.useRef<HTMLDivElement>(null);
   const refIndex = React.useRef(0);
@@ -82,12 +81,8 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
       onChangeIndex && onChangeIndex(index);
     };
 
-    sliderInstance.init(
-      elementWidth * components.length,
-      components.length,
-      option
-    );
-  }, [option, components]);
+    sliderInstance.init(elementWidth * components.length, components.length);
+  }, [components]);
 
   return (
     <div

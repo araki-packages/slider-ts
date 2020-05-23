@@ -9,3 +9,5 @@ extends:
   - '@team-lab/eslint-config/typescript'
   - 'prettier/@typescript-eslint'
   - 'plugin:prettier/recommended'
+rules:
+  "import/named": false
