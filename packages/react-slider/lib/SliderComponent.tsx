@@ -1,5 +1,6 @@
 /** @jsx React.createElement */
 import React from "react";
+
 import Slider, { ISliderOptions } from "@araki-packages/slider-core";
 
 export type SliderComponentProps = {
@@ -31,7 +32,6 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
     sliderInstance.start(x);
     handleWillChange(true);
 
-    console.log("handle start");
     // update event
     const mouseMoveHandler = (e: MouseEvent): void => {
       sliderInstance.update(e.pageX);

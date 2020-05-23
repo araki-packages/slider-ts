@@ -1,18 +1,22 @@
 const packageSelect = require("./packageCheck");
-const { spawn } = require("child_process");
+const { spawn } = require("child-process-promise");
 
 const main = async () => {
   const { packages } = await packageSelect();
-  packages.forEach((package) => {
-    const buildProcess = spawn("node", [
+
+  const results = packages.map((package) => {
+    return spawn("node", [
       "scripts/tasks/childProcess.js",
       package,
-    ]);
-    buildProcess.stdout.addListener("data", (chunk) => {
-      console.log(chunk.toString());
-    });
-    buildProcess.stdout.addListener("error", (chunk) => {
-      console.log(chunk.toString());
+    ]).then((result) => {
+      if (result.stderr != null) {
+        console.error('fail to build');
+        console.error(buildProcess.stderr);
+      }
+      if (result.stdout != null) console.error(results.stdout);
+    })
+    .catch(err => {
+      console.error(err);
     });
   });
 };
