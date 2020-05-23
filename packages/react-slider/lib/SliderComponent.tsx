@@ -7,7 +7,7 @@ export type SliderComponentProps = {
   components: Array<React.ReactElement>;
   copyNum: number;
   offsetLeft: number;
-  options: ISliderOptions;
+  options?: ISliderOptions;
 };
 
 export const SliderComponent: React.SFC<SliderComponentProps> = ({
@@ -15,6 +15,7 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
   components,
   copyNum,
   offsetLeft,
+  options,
 }) => {
   const refWrap = React.useRef<HTMLDivElement>(null);
   const refIndex = React.useRef(0);
@@ -81,8 +82,8 @@ export const SliderComponent: React.SFC<SliderComponentProps> = ({
       onChangeIndex && onChangeIndex(index);
     };
 
-    sliderInstance.init(elementWidth * components.length, components.length);
-  }, [components]);
+    sliderInstance.init(elementWidth * components.length, components.length, options);
+  }, [options, components]);
 
   return (
     <div
