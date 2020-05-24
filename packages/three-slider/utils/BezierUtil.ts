@@ -9,9 +9,18 @@ export const createCurvePoint = <T extends THREE.Vector>(
 ): (point: number) => T => {
   const maxLength = curveList.reduce((n, bezier) => n + bezier.getLength(), 0);
   const bezierLengthPoint = curveList.map((bezier) => bezier.getLength() / maxLength);
+
   return (point: number): T => {
     const [calcPoint, calcIndex] = ((): [number, number] => {
-      let currentPoint = point;
+      // 0-1
+      let currentPoint = (() => {
+        // マイナス値の除外
+        if (point < 0) {
+          return 1 + (point % 1);
+        }
+       return point % 1;
+      })();
+
       for(let i = 0; i < bezierLengthPoint.length; i++) {
         const bezierLength = bezierLengthPoint[i];
         if (currentPoint - bezierLength <= 0) {
@@ -21,7 +30,7 @@ export const createCurvePoint = <T extends THREE.Vector>(
       }
       return [1, bezierLengthPoint.length - 1];
     })();
-    return curveList[calcIndex].getPoint(calcPoint);
+    return curveList[calcIndex].getPointAt(calcPoint);
   };
 };
 
