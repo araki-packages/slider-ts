@@ -1,6 +1,6 @@
-const oneFrameAtMS = 1000 / 120;
+const oneFrameAtMS = 1000 / 1200;
 
-export const useSpyRequestAnimationFrame = () => {
+export const useSpyRequestAnimationFrame = (): void => {
   beforeEach(() => {
     let i = 0;
     jest
@@ -14,7 +14,7 @@ export const useSpyRequestAnimationFrame = () => {
   });
 };
 
-export const useSpyCancelAnimationFrame = () => {
+export const useSpyCancelAnimationFrame = (): void => {
   beforeEach(() => {
     let i = 0;
     jest
@@ -27,7 +27,7 @@ export const useSpyCancelAnimationFrame = () => {
   });
 };
 
-export const useSpyPerformanceNow = () => {
+export const useSpyPerformanceNow = (): void => {
   beforeEach(() => {
     let i = 100;
     jest.spyOn(window.performance, "now").mockImplementation(() => {
@@ -37,11 +37,10 @@ export const useSpyPerformanceNow = () => {
   });
 };
 
-export const sleep = (time: number) => {
-  return new Promise((r) => {
+export const sleep = (time: number): Promise<void> => {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      r();
+      resolve();
     }, time);
   });
 };
-
