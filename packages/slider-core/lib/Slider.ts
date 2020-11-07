@@ -140,6 +140,7 @@ export class Slider {
       }
       deltaTime = time - deltaTime;
       elapsedTime += deltaTime;
+      // easing式を噛ませればいい
       const offsetPosition = Math.sin((elapsedTime / maxTime) * (Math.PI / 2));
       const movement = offsetPosition * calcMovementPosition;
       this.currentX = position - movement;
