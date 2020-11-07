@@ -39,7 +39,7 @@ module.exports = {
     hot: true,
     inline: true,
     overlay: true,
-    port: 4030,
+    port: 4031,
     historyApiFallback: true,
   },
 };
