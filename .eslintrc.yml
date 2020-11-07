@@ -8,5 +8,3 @@ env:
 extends:
   - 'prettier/@typescript-eslint'
   - 'plugin:prettier/recommended'
-rules:
-  "import/named": false
