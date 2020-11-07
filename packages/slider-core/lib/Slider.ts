@@ -11,7 +11,16 @@ export class Slider {
   /* fields */
   private width!: number; // 全体の長さ
 
-  private currentX = 0; // 現在の位置情報
+  private _position = 0; // 現在の位置情報
+  set position(position: number) {
+    const nextPosition = this.updateLocation(position);
+    this._position = nextPosition;
+    this.handleChange(nextPosition);
+  }
+
+  get position(): number {
+    return this._position;
+  }
 
   private elementNum = 0; // 総エレメント巣
 
@@ -28,12 +37,14 @@ export class Slider {
 
   private rafToken?: number; // requestAnimationFrameのキャンセルトークン
 
+  private bezierFn!: (elapse: number) => number;
+
   /**
    * カルーセルクラス
    * @param width
    * @param isLoop 無限ループさせるかどうか
    */
-  constructor(caches: number = 10) {
+  constructor(caches = 10) {
     this.speedCalc = new SpeedCalculator(caches);
   }
 
@@ -57,16 +68,16 @@ export class Slider {
     this.width = width;
     this.elementNum = viewElementNum;
     this.itemWidth = this.width / this.elementNum;
-    this.currentX = this.option.initialIndex * this.itemWidth;
-    this.handleChange();
+    this.position = this.option.initialIndex * this.itemWidth;
+    this.bezierFn = this.option.bezier;
   }
 
   // タッチ or クリック 開始時に呼ばれるメソッド
   public start(position: number): void {
-    window.cancelAnimationFrame(this.rafToken || 0);
+    cancelAnimationFrame(this.rafToken || 0);
     this.prevUpdateProps = {
       position,
-      time: window.performance.now(),
+      time: performance.now(),
     };
     this.speedCalc.reset();
   }
@@ -76,12 +87,10 @@ export class Slider {
     const { position: pPosition, time: pTime } = this.prevUpdateProps;
 
     const moveOffset = pPosition - position;
-    const deltaTime = pTime - performance.now();
+    const prevTime = pTime - performance.now();
 
-    this.currentX += moveOffset;
-    this.updateLocation();
-    this.handleChange();
-    this.speedCalc.add((moveOffset / deltaTime) * 50);
+    this.position += moveOffset;
+    this.speedCalc.add((moveOffset / prevTime) * 50);
 
     this.prevUpdateProps = {
       time: performance.now(),
@@ -91,106 +100,100 @@ export class Slider {
 
   // タッチイベント終了時
   public end(): void {
-    const speed = this.speedCalc.get() * 10 * this.option.smooth;
-    const maxTime = Math.min(Math.max(Math.abs(speed), 100), 1000); // 速度の算出（最低２００ｍｓ）
-    this.moveTo(speed, maxTime * this.option.smooth);
+    const speed = this.speedCalc.get() * 10 * this.option.smooth; // 重み付けの差
+    const calcTime = Math.min(Math.max(Math.abs(speed), 100), 1000); // 速度の算出（最低２００ｍｓ）
+    this.moveTo(speed, calcTime * this.option.smooth);
   }
 
   // 次のスライド
-  public next(duration: number = 100): void {
+  public next(duration = 100): void {
     this.moveTo(this.itemWidth, duration);
   }
 
   // 前のスライド
-  public prev(duration: number = 100): void {
+  public prev(duration = 100): void {
     this.moveTo(-this.itemWidth, duration);
   }
 
   // TODO
-  public setIndex(index: number, duration: number = 1000): void {
+  public setIndex(index: number, duration = 1000): void {
     const target = index * this.itemWidth;
-    this.moveTo(target - this.currentX, duration);
+    this.moveTo(target - this.position, duration);
   }
 
   // 慣性スクロール
   private moveTo(movementPosition: number, maxTime: number): void {
     // 最終到達地点が半分かそうじゃないかで分岐
+    // ここが変
     const calcMovementPosition = this.option.isFit
       ? Math.floor(
           movementPosition -
             // koko
-            (this.itemWidth - (this.currentX % this.itemWidth)) +
+            (this.itemWidth - (this.position % this.itemWidth)) +
             // koko
             (this.itemWidth - (movementPosition % this.itemWidth))
         )
       : movementPosition;
 
-    let deltaTime = 0;
+    let prevTime = 0;
     let elapsedTime = 0;
 
-    const position = this.currentX;
-    const tick = (time: number): void => {
-      if (elapsedTime > maxTime) {
-        this.currentX = position - calcMovementPosition;
-        this.updateLocation();
-        this.handleChange();
-        this.onEnd && this.onEnd();
+    const position = this.position;
 
+    const tick = (time: number): void => {
+      elapsedTime += time - prevTime;
+      const elapsedParsentage = elapsedTime / maxTime;
+      if (elapsedParsentage >= 0.98) {
+        cancelAnimationFrame(this.rafToken || 0);
+        this.position = position - calcMovementPosition;
+        this.onEnd && this.onEnd();
         return;
       }
-      deltaTime = time - deltaTime;
-      elapsedTime += deltaTime;
-      // easing式を噛ませればいい
-      const offsetPosition = Math.sin((elapsedTime / maxTime) * (Math.PI / 2));
-      const movement = offsetPosition * calcMovementPosition;
-      this.currentX = position - movement;
-      this.updateLocation();
-      this.handleChange();
-      deltaTime = time;
-      this.rafToken = window.requestAnimationFrame(tick);
+      this.rafToken = requestAnimationFrame(tick);
+      const bezierParsentage =
+        this.bezierFn(elapsedParsentage) * calcMovementPosition;
+
+      this.position = position - bezierParsentage * calcMovementPosition;
+      prevTime = time;
     };
 
-    requestAnimationFrame((time: number) => {
-      deltaTime = time;
+    this.rafToken = requestAnimationFrame((time: number) => {
       requestAnimationFrame(tick);
+      prevTime = time;
     });
   }
 
-  private handleChange(): void {
-    const index = Math.round(this.currentX / this.itemWidth);
-    this.onChange && this.onChange(this.currentX, index);
+  private handleChange(nextPosition: number): void {
+    const index = Math.round(nextPosition / this.itemWidth);
+    this.onChange && this.onChange(this.position, index);
   }
 
   // ロケーションのアップデート
-  private updateLocation(): void {
+  private updateLocation(nextPosition: number): number {
     if (this.option.isLoop) {
-      this.updateLocationIsLoop();
-    } else {
-      this.updateLocationIsNotLoop();
+      return this.updateLocationIsLoop(nextPosition);
     }
+    return this.updateLocationIsNotLoop(nextPosition);
   }
 
-  private updateLocationIsLoop(): void {
+  private updateLocationIsLoop(nextPosition: number): number {
     const maxLength = this.itemWidth * this.elementNum;
-    if (this.currentX < 0) {
-      this.currentX = maxLength + (this.currentX % maxLength);
-
-      return;
+    if (nextPosition < 0) {
+      return maxLength + (this.position % maxLength);
     }
-    this.currentX %= maxLength;
+    return nextPosition % maxLength;
   }
 
-  private updateLocationIsNotLoop(): void {
+  private updateLocationIsNotLoop(nextPosition: number): number {
     const maxLength = this.itemWidth * this.elementNum;
     const minPosition = 0;
     const maxPosition = maxLength - this.option.wrapperWidth;
-    if (this.currentX < minPosition) {
-      this.currentX = 0;
-
-      return;
+    if (nextPosition < minPosition) {
+      return 0;
     }
-    if (this.currentX > maxPosition) {
-      this.currentX = maxLength - this.itemWidth - this.option.wrapperWidth;
+    if (nextPosition > maxPosition) {
+      return maxLength - this.itemWidth - this.option.wrapperWidth;
     }
+    return nextPosition;
   }
 }
