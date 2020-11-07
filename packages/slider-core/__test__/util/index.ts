@@ -29,7 +29,7 @@ export const useSpyCancelAnimationFrame = (): void => {
 
 export const useSpyPerformanceNow = (): void => {
   beforeEach(() => {
-    let i = 100;
+    let i = 1000;
     jest.spyOn(window.performance, "now").mockImplementation(() => {
       i += oneFrameAtMS;
       return i;

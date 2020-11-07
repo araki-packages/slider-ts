@@ -135,32 +135,23 @@ export class Slider {
         )
       : movementPosition;
 
-    let prevTime = 0;
-    let elapsedTime = 0;
-
-    const position = this.position;
-
+    let startTime: null | number = null;
     const tick = (time: number): void => {
-      elapsedTime += time - prevTime;
-      const elapsedParsentage = elapsedTime / maxTime;
-      if (elapsedParsentage >= 0.98) {
+      if (startTime === null)startTime = time;
+      const elapsedTime = time - startTime;
+      if (elapsedTime >= maxTime) {
         cancelAnimationFrame(this.rafToken || 0);
-        this.position = position - calcMovementPosition;
+        this.position = this.position - calcMovementPosition;
         this.onEnd && this.onEnd();
         return;
       }
-      this.rafToken = requestAnimationFrame(tick);
+      const elapsedParsentage = elapsedTime / maxTime;
       const bezierParsentage =
-        this.bezierFn(elapsedParsentage) * calcMovementPosition;
-
-      this.position = position - bezierParsentage * calcMovementPosition;
-      prevTime = time;
+        this.bezierFn(elapsedParsentage);
+      this.position = this.position - bezierParsentage * calcMovementPosition;
+      this.rafToken = requestAnimationFrame(tick);
     };
-
-    this.rafToken = requestAnimationFrame((time: number) => {
-      requestAnimationFrame(tick);
-      prevTime = time;
-    });
+    requestAnimationFrame(tick);
   }
 
   private handleChange(nextPosition: number): void {
@@ -177,7 +168,7 @@ export class Slider {
   }
 
   private updateLocationIsLoop(nextPosition: number): number {
-    const maxLength = this.itemWidth * this.elementNum;
+    const maxLength = this.itemWidth * (this.elementNum - 1);
     if (nextPosition < 0) {
       return maxLength + (this.position % maxLength);
     }
