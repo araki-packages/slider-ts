@@ -1,6 +1,6 @@
 {
   "name": "@araki-packages/vue-slider",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "> TODO: description",
   "author": "ArakiTakaki <arakitakaki.work@gmail.com>",
   "homepage": "https://github.com/araki-packages/slider-ts#readme",
@@ -34,6 +34,6 @@
     "url": "https://github.com/araki-packages/slider-ts/issues"
   },
   "dependencies": {
-    "@araki-packages/slider-core": "^0.1.0"
+    "@araki-packages/slider-core": "^0.1.1"
   }
 }
