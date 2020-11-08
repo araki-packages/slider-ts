@@ -1,5 +1,5 @@
 import { SpeedCalculator } from "./SpeedCalculator";
-import { ISliderOptions } from "./interfaces";
+import { ISliderOptions, MoveRelation } from "./interfaces";
 import { InitialSliderOptions } from "./constants";
 
 export class Slider {
@@ -28,9 +28,10 @@ export class Slider {
 
   private itemWidth!: number;
 
-  private prevUpdateProps: { time: number; position: number } = {
+  private prevMoveRelation: MoveRelation = {
+    verocity: 0,
     time: 0,
-    position: 0,
+    distance: 0,
   };
 
   private option!: Required<ISliderOptions>;
@@ -75,83 +76,83 @@ export class Slider {
   // タッチ or クリック 開始時に呼ばれるメソッド
   public start(position: number): void {
     cancelAnimationFrame(this.rafToken || 0);
-    this.prevUpdateProps = {
-      position,
+    this.prevMoveRelation = {
+      distance: position,
+      verocity: 0,
       time: performance.now(),
     };
-    this.speedCalc.reset();
+    this.speedCalc.reset(performance.now());
   }
 
   // 場所のアップデート
-  public update(position: number): void {
-    const { position: pPosition, time: pTime } = this.prevUpdateProps;
+  public update(currentDistance: number): void {
+    const { distance: prevDistance, time: prevTime } = this.prevMoveRelation;
+    const currentTime = performance.now();
 
-    const moveOffset = pPosition - position;
-    const prevTime = pTime - performance.now();
+    const deltaDistance = -prevDistance + currentDistance;
+    const deltaTime = -prevTime + currentTime;
 
-    this.position += moveOffset;
-    this.speedCalc.add((moveOffset / prevTime) * 50);
+    // const deltaTime = prevTime - performance.now();
+    this.position += deltaDistance;
+    const verocity = deltaDistance / deltaTime;
 
-    this.prevUpdateProps = {
-      time: performance.now(),
-      position,
+    this.prevMoveRelation = {
+      time: currentTime,
+      distance: currentDistance,
+      verocity: verocity,
     };
+
+    this.speedCalc.add({
+      time: currentTime,
+      distance: currentDistance,
+      verocity: verocity,
+    });
   }
 
   // タッチイベント終了時
   public end(): void {
-    const speed = this.speedCalc.get() * 10 * this.option.smooth; // 重み付けの差
-    const calcTime = Math.min(Math.max(Math.abs(speed), 100), 1000); // 速度の算出（最低２００ｍｓ）
-    this.moveTo(speed, calcTime * this.option.smooth);
+    const currentSpeed = this.speedCalc.getAverageVerocity(); // 重み付けの差
+    this.moveTo(currentSpeed);
   }
 
   // 次のスライド
   public next(duration = 100): void {
-    this.moveTo(this.itemWidth, duration);
+    console.log(duration,  '未実装');
   }
 
   // 前のスライド
   public prev(duration = 100): void {
-    this.moveTo(-this.itemWidth, duration);
+    console.log(duration,  '未実装');
   }
 
-  // TODO
   public setIndex(index: number, duration = 1000): void {
-    const target = index * this.itemWidth;
-    this.moveTo(target - this.position, duration);
+    console.log(index, duration,  '未実装');
   }
 
   // 慣性スクロール
-  private moveTo(movementPosition: number, maxTime: number): void {
-    // 最終到達地点が半分かそうじゃないかで分岐
-    // ここが変
-    const calcMovementPosition = this.option.isFit
-      ? Math.floor(
-          movementPosition -
-            // koko
-            (this.itemWidth - (this.position % this.itemWidth)) +
-            // koko
-            (this.itemWidth - (movementPosition % this.itemWidth))
-        )
-      : movementPosition;
+  public moveTo(verocity: number): void {
+    let prevTime: null | number = null;
+    let currentVerosity = verocity;
 
-    let startTime: null | number = null;
-    const tick = (time: number): void => {
-      if (startTime === null)startTime = time;
-      const elapsedTime = time - startTime;
-      if (elapsedTime >= maxTime) {
-        cancelAnimationFrame(this.rafToken || 0);
-        this.position = this.position - calcMovementPosition;
+    if (verocity === 0){
+      return
+    }
+    const tick = (currentTime: number) => {
+      if (prevTime === null) prevTime = currentTime - 15; // 1 frame?
+      // const deltaTime = prevTime - currentTime;
+      if (Math.abs(currentVerosity) < 0.1) {
         this.onEnd && this.onEnd();
         return;
       }
-      const elapsedParsentage = elapsedTime / maxTime;
-      const bezierParsentage =
-        this.bezierFn(elapsedParsentage);
-      this.position = this.position - bezierParsentage * calcMovementPosition;
-      this.rafToken = requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
+      // 0.2を可変させることが大事？
+      //
+      this.position += currentVerosity * (-prevTime + currentTime);
+      currentVerosity += (-verocity + 0) / 100;
+      prevTime = currentTime;
+      window.requestAnimationFrame(tick);
+    }
+    this.rafToken = window.requestAnimationFrame(tick)
+    // 結果 0 - currentSpeed * elapsed
   }
 
   private handleChange(nextPosition: number): void {

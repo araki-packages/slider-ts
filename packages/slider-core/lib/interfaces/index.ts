@@ -7,3 +7,8 @@ export interface ISliderOptions {
   smooth?: number; // 0 - 1 default 1
   bezier?: (elapse: number) => number;
 }
+export interface MoveRelation {
+  verocity: number;
+  distance: number;
+  time: number;
+}

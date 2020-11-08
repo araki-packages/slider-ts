@@ -1,20 +1,31 @@
+import {MoveRelation} from "./interfaces";
+
+/**
+ * SpeedCalculator
+ * @summary
+ */
 export class SpeedCalculator {
-  speedList: number[] = [];
+  private movementState: MoveRelation[] = [];
+  private startTime: number = 0;
   constructor(public cacheNum: number) {}
-  public  reset() {
-    this.speedList = [];
+  public  reset(startTime: number) {
+    this.startTime = startTime;
+    this.movementState = [];
   }
-  public add(speedNum: number) {
-    this.speedList.push(speedNum)
-    if (this.speedList.length > this.cacheNum) {
-      this.speedList.shift();
+  public add(relation: MoveRelation) {
+    this.movementState.push({
+      ...relation,
+      time: -this.startTime - relation.time,
+    })
+    if (this.movementState.length > this.cacheNum) {
+      this.movementState.shift();
     }
   }
-  public get() {
-    if (this.speedList.length === 0) return 0;
-    const result = this.speedList.reduce((prev, next) => {
-      return prev + next;
-    }) / this.speedList.length;
+  public getAverageVerocity() {
+    if (this.movementState.length === 0) return 0;
+    const result = this.movementState.reduce((prev, next) => {
+      return next.verocity + prev;
+    }, 0) / this.movementState.length;
     return result;
   }
 }

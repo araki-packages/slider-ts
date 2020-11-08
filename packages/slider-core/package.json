@@ -30,6 +30,7 @@
   },
   "scripts": {
     "prebuild": "rimraf dist",
+    "test": "jest",
     "build": "rollup -c",
     "prepublishOnly": "npm run build",
     "release": "npm publish"

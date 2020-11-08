@@ -1,7 +1,188 @@
-'use strict';
+import { Slider } from "../SliderCore";
 
-module.exports = sliderCore;
+const oneFrameAtMS = 1000 / 120;
+const useSpyRequestAnimationFrame = (): void => {
+  beforeEach(() => {
+    let i = 0;
+    jest
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        i += oneFrameAtMS;
+        callback(i);
+        const id = Math.random();
+        return id;
+      });
+  });
+};
 
-function sliderCore() {
-    // TODO
+const useSpyPerformanceNow = (): void => {
+  beforeEach(() => {
+    let i = 1000;
+    jest.spyOn(window.performance, "now").mockImplementation(() => {
+      i += oneFrameAtMS;
+      return i;
+    });
+  });
+};
+
+class SliderLogger {
+  private list: Array<{ x: number; i: number }> = [];
+
+  public add(x: number, i: number): void {
+    this.list.push({ x, i });
+  }
+
+  public clear(): void {
+    this.list = [];
+  }
+
+  public toCSV(): string {
+    const table = "'position', 'index'";
+    const record = this.list.map(({ x, i }) => `${x}, ${i}`).join("\n");
+
+    return `\n${table}\n${record}\n`;
+  }
 }
+
+const itemWidth = 100;
+const elementNum = 5;
+const initialWidth = itemWidth * elementNum;
+// const maxWidth = itemWidth * elementNum;
+useSpyRequestAnimationFrame();
+useSpyPerformanceNow();
+
+describe("基本動作テスト", () => {
+  it("ループのテスト:スナップショット1", () => {
+    const width = itemWidth * elementNum;
+    const instance = new Slider();
+    const logList = new SliderLogger();
+
+    instance.onChange = (x, i) => {
+      logList.add(x, i);
+    };
+
+    instance.init(width, elementNum, {
+      isFit: true,
+      isLoop: true,
+    });
+    instance.onEnd = () => {
+      expect(logList.toCSV()).toMatchSnapshot();
+      logList.clear();
+    };
+    instance.start(5);
+    instance.update(-100);
+    instance.update(-200);
+    instance.update(-300);
+    instance.end();
+  });
+  it("ループのテスト:スナップショット2", () => {
+    const width = itemWidth * elementNum;
+    const instance = new Slider();
+    const logList = new SliderLogger();
+
+    instance.onChange = (x, i) => {
+      logList.add(x, i);
+    };
+
+    instance.init(width, elementNum, {
+      isFit: true,
+      isLoop: true,
+    });
+    instance.onEnd = () => {
+      expect(logList.toCSV()).toMatchSnapshot();
+      logList.clear();
+    };
+    instance.start(5);
+    instance.update(100);
+    instance.update(200);
+    instance.update(300);
+    instance.end();
+  });
+
+  it("非ループのテスト:スナップショット", () => {
+    const instance = new Slider();
+    const logList = new SliderLogger();
+
+    instance.onChange = (x, i) => {
+      logList.add(x, i);
+    };
+    instance.init(initialWidth, elementNum, {
+      isFit: true,
+      isLoop: false,
+    });
+    instance.onEnd = () => {
+      expect(logList.toCSV()).toMatchSnapshot();
+      logList.clear();
+    };
+
+    instance.start(5);
+    instance.update(-50);
+    instance.update(-100);
+    instance.end();
+
+    instance.start(5);
+    instance.update(50);
+    instance.update(100);
+    instance.end();
+  });
+
+  it("非ループ値限界値テスト", () => {
+    const instance = new Slider();
+    // let rx = 0;
+    const logList: Array<{ x: number; i: number }> = [];
+
+    instance.onChange = (x, i) => {
+      logList.push({ x, i });
+    //  rx = x;
+    };
+    instance.init(initialWidth, elementNum, {
+      isLoop: false,
+    });
+
+    // instance.onEnd = () => {
+    //   expect(rx).toBe(0);
+    // };
+    instance.start(5);
+    instance.update(25);
+    instance.update(50);
+    instance.update(75);
+    instance.end();
+
+    // instance.onEnd = () => {
+    //   expect(rx).toBe(maxWidth - itemWidth);
+    // };
+    instance.start(0);
+    instance.update(-25);
+    instance.update(-50);
+    instance.update(-75);
+    instance.end();
+  });
+
+  it("インデックス移動テスト", () => {
+    const instance = new Slider();
+    instance.init(initialWidth, elementNum);
+
+    const testIndex = (index: number): void => {
+      // let ri = 0;
+      // instance.onChange = (_, i) => {
+      //   ri = i;
+      // };
+      // instance.onEnd = () => {
+      //   expect(ri).toBe(index);
+      // };
+      instance.setIndex(index);
+    };
+
+    const testIndexList = [0, 1, 2, 3, 4, 5];
+
+    testIndexList.sort(() => Math.random() - 0.5);
+    testIndexList.forEach((i) => {
+      testIndex(i);
+    });
+
+    testIndexList.sort(() => Math.random() - 0.5);
+    testIndexList.forEach((i) => {
+      testIndex(i);
+    });
+  });
+});
