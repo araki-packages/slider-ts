@@ -6,6 +6,7 @@ import { terser } from "rollup-plugin-terser";
 import dts from "rollup-plugin-dts";
 import camelCase from "lodash.camelcase";
 import upperFirst from "lodash.upperfirst";
+const tsconfig = require( '../../tsconfig.json');
 
 import pkg from "./package.json";
 
@@ -53,10 +54,8 @@ export default [
     external: [...Object.keys(pkg.devDependencies || {})],
     plugins: [
       resolve(),
-      ts({
-        target: 'es5'
-      }),
-      commonjs({ extensions: [".ts", ".js"] }),
+      ts(tsconfig.compilerOptions),
+      commonjs({ extensions: [".ts", ".js", ".tsx", ".jsx"] }),
     ],
   },
   // モジュール用設定
@@ -85,10 +84,8 @@ export default [
     ],
     plugins: [
       resolve(),
-      ts({
-        target: 'es5'
-      }),
-      commonjs({ extensions: [".ts", ".js"] }),
+      ts(tsconfig.compilerOptions),
+      commonjs({ extensions: [".ts", ".js", ".tsx", ".jsx"] }),
     ],
   },
   {
