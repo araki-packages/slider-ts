@@ -1,6 +1,6 @@
 // 各種プラグインを読み込む
 import resolve from "@rollup/plugin-node-resolve";
-import typescript from "@rollup/plugin-typescript";
+import ts from "@rollup/plugin-typescript";
 import commonjs from "@rollup/plugin-commonjs";
 import { terser } from "rollup-plugin-terser";
 import dts from "rollup-plugin-dts";
@@ -53,7 +53,9 @@ export default [
     external: [...Object.keys(pkg.devDependencies || {})],
     plugins: [
       resolve(),
-      typescript(),
+      ts({
+        target: 'es5'
+      }),
       commonjs({ extensions: [".ts", ".js"] }),
     ],
   },
@@ -83,7 +85,9 @@ export default [
     ],
     plugins: [
       resolve(),
-      typescript(),
+      ts({
+        target: 'es5'
+      }),
       commonjs({ extensions: [".ts", ".js"] }),
     ],
   },
