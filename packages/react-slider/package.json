@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "types/index.d.ts",
-  "browser": "dist/slider-core.js",
+  "browser": "dist/react-slider.js",
   "files": [
     "dist",
     "src",
@@ -32,5 +32,8 @@
   },
   "bugs": {
     "url": "https://github.com/araki-packages/slider-ts/issues"
+  },
+  "dependencies": {
+    "@araki-packages/slider-core": "^0.1.0"
   }
 }
