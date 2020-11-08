@@ -42,5 +42,8 @@
     "lodash.upperfirst": "^4.3.1",
     "rimraf": "^3.0.2",
     "rollup-plugin-dts": "^1.4.13"
+  },
+  "dependencies": {
+    "@takumus/cubic-bezier": "^1.0.2"
   }
 }

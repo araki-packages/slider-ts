@@ -1410,6 +1410,11 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@takumus/cubic-bezier@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@takumus/cubic-bezier/-/cubic-bezier-1.0.2.tgz#9cbe2ea9742ef5b198cce344aa1ba9560f55d04f"
+  integrity sha512-teOrECMAgP4nNCMHf/ya+nS1WHZydMLLSYb5D+JilBnFxkwc4XAB7CuE3T4JOevAPAebFrWG81Th3SNDr4Zebw==
+
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.7":
   version "7.1.12"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.12.tgz#4d8e9e51eb265552a7e4f1ff2219ab6133bdfb2d"
