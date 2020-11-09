@@ -1,6 +1,6 @@
 {
   "name": "@araki-packages/react-slider",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "> TODO: description",
   "author": "ArakiTakaki <arakitakaki.work@gmail.com>",
   "homepage": "https://github.com/araki-packages/slider-ts#readme",
@@ -34,7 +34,7 @@
     "url": "https://github.com/araki-packages/slider-ts/issues"
   },
   "dependencies": {
-    "@araki-packages/slider-core": "^0.1.1"
+    "@araki-packages/slider-core": "^0.1.2"
   },
   "peerDependencies": {
     "react": "^17.0.1",
