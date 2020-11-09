@@ -1,2 +1,2 @@
-import HogeComponent from './hoge';
-export const Hoge = HogeComponent;
+import SliderComponent from './SliderComponent';
+export const Slider = SliderComponent;

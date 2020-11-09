@@ -1,56 +1,49 @@
 import { SpeedCalculator } from "./SpeedCalculator";
 import { ISliderOptions, MoveRelation } from "./interfaces";
 import { InitialSliderOptions } from "./constants";
+import { deltaAnimation } from "./util/";
 
 export class Slider {
   /* event listeners */
   public onChange?: (x: number, index: number) => void; // changeEvent
-
   public onEnd?: () => void; // endEvent
 
   /* fields */
   private width!: number; // 全体の長さ
+  private elementNum = 0; // 総エレメント巣
+  private itemWidth: number = 0; // アイテムの横幅
 
   private _position = 0; // 現在の位置情報
+  private cancelAnimation: () => void = () => {}; // requestAnimationFrameのキャンセルトークン
+  private option!: Required<ISliderOptions>;
+  private isAnimating: boolean = false;
+
   set position(position: number) {
     const nextPosition = this.updateLocation(position);
     this._position = nextPosition;
-    this.handleChange(nextPosition);
+    this.onChange && this.onChange(nextPosition, this.currentIndex);
   }
 
   get position(): number {
     return this._position;
   }
 
-  private elementNum = 0; // 総エレメント巣
+  public get currentIndex(): number {
+    // TODO 式の見直しが必要。
+    return Math.round(this._position / this.itemWidth + 0.1);
+  }
 
   private speedCalc: SpeedCalculator;
-
-  private itemWidth!: number;
-
   private prevMoveRelation: MoveRelation = {
     verocity: 0,
     time: 0,
     distance: 0,
   };
 
-  private option!: Required<ISliderOptions>;
-
-  private rafToken?: number; // requestAnimationFrameのキャンセルトークン
-
-  private bezierFn!: (elapse: number) => number;
-
   /**
    * カルーセルクラス
    * @param width
    * @param isLoop 無限ループさせるかどうか
-   */
-  constructor(caches = 10) {
-    this.speedCalc = new SpeedCalculator(caches);
-  }
-
-  // 初期化イベント
-  /**
    * @param width 描画範囲
    * @param viewElementNum 描画範囲内のアイテム数
    * @param options.isLoop
@@ -58,37 +51,35 @@ export class Slider {
    * @param options.initialIndex
    * @param options.smooth - 移動時のなめらかさ
    */
-  public init(
+  public constructor(
     width: number,
     viewElementNum: number,
     option?: ISliderOptions
-  ): void {
+  ) {
+    this.speedCalc = new SpeedCalculator(10);
     this.option = { ...InitialSliderOptions, ...option };
     this.option.smooth = Math.max(this.option.smooth, 0.01);
-
     this.width = width;
     this.elementNum = viewElementNum;
     this.itemWidth = this.width / this.elementNum;
     this.position = this.option.initialIndex * this.itemWidth;
-    this.bezierFn = this.option.bezier;
   }
 
   // タッチ or クリック 開始時に呼ばれるメソッド
   public start(position: number): void {
-    cancelAnimationFrame(this.rafToken || 0);
+    this.cancelAnimation();
     this.prevMoveRelation = {
       distance: position,
       verocity: 0,
       time: performance.now(),
     };
-    this.speedCalc.reset(performance.now());
   }
 
   // 場所のアップデート
   public update(currentDistance: number): void {
     const { distance: prevDistance, time: prevTime } = this.prevMoveRelation;
-    const currentTime = performance.now();
 
+    const currentTime = performance.now();
     const deltaDistance = -prevDistance + currentDistance;
     const deltaTime = -prevTime + currentTime;
 
@@ -103,89 +94,91 @@ export class Slider {
     };
 
     this.speedCalc.add({
-      time: currentTime,
-      distance: currentDistance,
+      time: deltaTime,
+      distance: deltaDistance,
       verocity: verocity,
     });
   }
 
   // タッチイベント終了時
   public end(): void {
-    const currentSpeed = this.speedCalc.getAverageVerocity(); // 重み付けの差
-    this.moveTo(currentSpeed);
+    const average = this.speedCalc.getNextPosition(); // 重み付けの差
+    this.speedCalc.reset();
+    this.moveTo(average.distance, average.time);
   }
 
-  // 次のスライド
-  public next(duration = 100): void {
-    console.log(duration,  '未実装');
+  /**
+   * next index position
+   * @summary verocity = -currentPosition + targetPosition / time
+   */
+  public next(time = 100): void {
+    if (this.isAnimating) return;
+    this.moveTo(this.itemWidth, time);
   }
 
-  // 前のスライド
-  public prev(duration = 100): void {
-    console.log(duration,  '未実装');
+  /**
+   * prev index  position
+   * @summary verocity = -currentPosition + targetPosition / time
+   */
+  public prev(time = 100): void {
+    if (this.isAnimating) return;
+    this.moveTo(-this.itemWidth, time);
   }
 
-  public setIndex(index: number, duration = 1000): void {
-    console.log(index, duration,  '未実装');
+  /**
+   * go to target index
+   * @summary verocity = -currentPosition + targetPosition / time
+   */
+  public moveToByIndex(index: number, time = 1000): void {
+    if (this.isAnimating) return;
+
+    const nextPosition =
+      -(this.position % this.itemWidth) - this.itemWidth * index;
+    this.moveTo(nextPosition, time);
   }
 
-  // 慣性スクロール
-  public moveTo(verocity: number): void {
-    let prevTime: null | number = null;
-    let currentVerosity = verocity;
+  /**
+   * 慣性スクロール
+   */
+  public moveTo(distance: number, time: number): void {
+    this.cancelAnimation();
+    const currentPosition = this.position;
 
-    if (verocity === 0){
-      return
+    const calcPosition = (parcentage: number) => {
+      const targetIndex = Math.round((currentPosition + distance) / this.itemWidth);
+      const targetPosition = targetIndex * this.itemWidth;
+      return currentPosition + (-currentPosition + targetPosition) * parcentage;
+      // return currentPosition + distance * parcentage;
     }
-    const tick = (currentTime: number) => {
-      if (prevTime === null) prevTime = currentTime - 15; // 1 frame?
-      // const deltaTime = prevTime - currentTime;
-      if (Math.abs(currentVerosity) < 0.1) {
-        this.onEnd && this.onEnd();
+
+    this.cancelAnimation = deltaAnimation((_, elapsedTime) => {
+      if (elapsedTime > time) {
+        this.cancelAnimation();
+        this.position = calcPosition(1);
+        this.handleEnd();
         return;
       }
-      // 0.2を可変させることが大事？
-      //
-      this.position += currentVerosity * (-prevTime + currentTime);
-      currentVerosity += (-verocity + 0) / 100;
-      prevTime = currentTime;
-      window.requestAnimationFrame(tick);
-    }
-    this.rafToken = window.requestAnimationFrame(tick)
-    // 結果 0 - currentSpeed * elapsed
+      const persentage = elapsedTime / time;
+      this.position = calcPosition(this.option.bezier(persentage));
+    });
   }
 
-  private handleChange(nextPosition: number): void {
-    const index = Math.round(nextPosition / this.itemWidth);
-    this.onChange && this.onChange(this.position, index);
-  }
-
-  // ロケーションのアップデート
+  // positionのバリデーション
   private updateLocation(nextPosition: number): number {
+    // ループ時
     if (this.option.isLoop) {
-      return this.updateLocationIsLoop(nextPosition);
+      const maxLength = this.itemWidth * (this.elementNum - 1);
+      return (maxLength + (nextPosition % maxLength)) % maxLength;
     }
-    return this.updateLocationIsNotLoop(nextPosition);
-  }
-
-  private updateLocationIsLoop(nextPosition: number): number {
+    if (nextPosition < 0) return 0; // 0未満拒否
+    // 否ループ時
+    // 1枚は最低表示させるようにする
     const maxLength = this.itemWidth * (this.elementNum - 1);
-    if (nextPosition < 0) {
-      return maxLength + (this.position % maxLength);
-    }
-    return nextPosition % maxLength;
+    if (nextPosition > maxLength) return maxLength;
+    return nextPosition;
   }
 
-  private updateLocationIsNotLoop(nextPosition: number): number {
-    const maxLength = this.itemWidth * this.elementNum;
-    const minPosition = 0;
-    const maxPosition = maxLength - this.option.wrapperWidth;
-    if (nextPosition < minPosition) {
-      return 0;
-    }
-    if (nextPosition > maxPosition) {
-      return maxLength - this.itemWidth - this.option.wrapperWidth;
-    }
-    return nextPosition;
+  private handleEnd() {
+    this.onEnd && this.onEnd();
   }
 }
