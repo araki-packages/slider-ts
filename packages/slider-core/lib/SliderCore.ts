@@ -145,10 +145,12 @@ export class Slider {
     const currentPosition = this.position;
 
     const calcPosition = (parcentage: number) => {
-      const targetIndex = Math.round((currentPosition + distance) / this.itemWidth);
-      const targetPosition = targetIndex * this.itemWidth;
-      return currentPosition + (-currentPosition + targetPosition) * parcentage;
-      // return currentPosition + distance * parcentage;
+      if (this.option.isFit) {
+        const targetIndex = Math.round((currentPosition + distance) / this.itemWidth);
+        const targetPosition = targetIndex * this.itemWidth;
+        return currentPosition + (-currentPosition + targetPosition) * parcentage;
+      }
+      return currentPosition + distance * parcentage;
     }
 
     this.cancelAnimation = deltaAnimation((_, elapsedTime) => {
