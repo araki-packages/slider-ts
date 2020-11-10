@@ -55,7 +55,7 @@ declare class Slider {
     /**
      * 慣性スクロール
      */
-    moveTo(distance: number, time: number): void;
+    moveTo(distance: number, time: number, isFit: boolean): void;
     private updateLocation;
     private handleEnd;
 }

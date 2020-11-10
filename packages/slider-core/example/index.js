@@ -1,7 +1,7 @@
 const startSliderByElementID = (elementId, options) => {
   const wrap = document.getElementById(elementId);
   // const childNodes = wrap.childNodes
-  const sliderInstance = new SliderCore.Slider(962 * 7, 7, options);
+  const sliderInstance = new SliderCore.Slider(wrap.children[0].scrollWidth * 7, 7, options);
 
   sliderInstance.onChange = (x) => {
     wrap.style.transform = `translateX(${-x}px)`;
@@ -23,6 +23,7 @@ const startSliderByElementID = (elementId, options) => {
     window.addEventListener("mousemove", update);
     window.addEventListener("mouseup", end);
   });
+
   const createButton = (text, cb) => {
     const elButton = document.createElement("button");
     elButton.innerText = text;

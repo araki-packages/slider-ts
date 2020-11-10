@@ -104,7 +104,7 @@ export class Slider {
   public end(): void {
     const average = this.speedCalc.getNextPosition(); // 重み付けの差
     this.speedCalc.reset();
-    this.moveTo(average.distance, average.time);
+    this.moveTo(average.distance, average.time, this.option.isFit);
   }
 
   /**
@@ -113,7 +113,7 @@ export class Slider {
    */
   public next(time = 100): void {
     if (this.isAnimating) return;
-    this.moveTo(this.itemWidth, time);
+    this.moveTo(this.itemWidth, time, true);
   }
 
   /**
@@ -122,7 +122,7 @@ export class Slider {
    */
   public prev(time = 100): void {
     if (this.isAnimating) return;
-    this.moveTo(-this.itemWidth, time);
+    this.moveTo(-this.itemWidth, time, true);
   }
 
   /**
@@ -134,18 +134,18 @@ export class Slider {
 
     const nextPosition =
       -(this.position % this.itemWidth) - this.itemWidth * index;
-    this.moveTo(nextPosition, time);
+    this.moveTo(nextPosition, time, true);
   }
 
   /**
    * 慣性スクロール
    */
-  public moveTo(distance: number, time: number): void {
+  public moveTo(distance: number, time: number, isFit: boolean): void {
     this.cancelAnimation();
     const currentPosition = this.position;
 
     const calcPosition = (parcentage: number) => {
-      if (this.option.isFit) {
+      if (isFit) {
         const targetIndex = Math.round((currentPosition + distance) / this.itemWidth);
         const targetPosition = targetIndex * this.itemWidth;
         return currentPosition + (-currentPosition + targetPosition) * parcentage;
