@@ -1,11 +1,18 @@
-const startSliderByElementID = (elementId, options) => {
-  const wrap = document.getElementById(elementId);
-  // const childNodes = wrap.childNodes
+const offset = 0;
+const startSliderByElementID = (wrap, options, autoNext) => {
   const sliderInstance = new SliderCore.Slider(wrap.children[0].scrollWidth * 7, 7, options);
 
   sliderInstance.onChange = (x) => {
     wrap.style.transform = `translateX(${-x}px)`;
   };
+  if (autoNext) {
+    offset += 320;
+    setTimeout(() => {
+      setInterval(() => {
+        sliderInstance.next(1000);
+      }, 1000);
+    }, offset);
+  }
 
   const update = (e) => {
     sliderInstance.update(-e.pageX);
@@ -15,7 +22,6 @@ const startSliderByElementID = (elementId, options) => {
     window.removeEventListener("mouseup", end);
     sliderInstance.end();
   };
-
   wrap.addEventListener("mousedown", (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -37,12 +43,18 @@ const startSliderByElementID = (elementId, options) => {
   });
   document.body.appendChild(button);
 };
+
 window.onload = () => {
-  startSliderByElementID("slider");
-  startSliderByElementID("slider2", {
+  startSliderByElementID(document.getElementById("slider"));
+  startSliderByElementID(document.getElementById("slider2"), {
     isLoop: false,
   });
-  startSliderByElementID("slider3", {
+  startSliderByElementID(document.getElementById("slider3"), {
     isFit: true,
   });
+  const elements = document.querySelectorAll('.auto-slider');
+  for (let i = 0; i < elements.length; i++ ) {
+    console.log(elements[i]);
+    startSliderByElementID(elements[i], undefined, true);
+  }
 }
