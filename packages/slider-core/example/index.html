@@ -1,11 +1,83 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <h1>examples</h1>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./slider-core.min.js" defer></script>
+    <script src="./index.js" defer></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .sliders {
+        margin: 20px;
+        border: 1px solid;
+        padding: 20px;
+        border-radius: 20px;
+        overflow: hidden;
+        background-color: #eee;
+      }
+      .slider-wrap {
+        width: 100%;
+        overflow: hidden;
+        background-color: #fff;
+        border: solid 1px;
+        margin: 10px 0;
+        border-radius: 10px;
+      }
+      .slider {
+        display: flex;
+      }
+      .item {
+        min-width: 50vw;
+        font-size: 3rem;
+        line-height: 10vh;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sliders">
+      <div class="slider-wrap">
+        <div id="slider" class="slider">
+          <div class="item" style="background-color: #333;">1</div>
+          <div class="item" style="background-color: #444;">2</div>
+          <div class="item" style="background-color: #555;">3</div>
+          <div class="item" style="background-color: #666;">4</div>
+          <div class="item" style="background-color: #777;">5</div>
+          <div class="item" style="background-color: #888;">6</div>
+          <div class="item" style="background-color: #333;">1</div>
+          <div class="item" style="background-color: #444;">2</div>
+          <div class="item" style="background-color: #555;">3</div>
+        </div>
+      </div>
+      <div class="slider-wrap">
+        <div id="slider2" class="slider">
+          <div class="item" style="background-color: #333;">1</div>
+          <div class="item" style="background-color: #444;">2</div>
+          <div class="item" style="background-color: #555;">3</div>
+          <div class="item" style="background-color: #666;">4</div>
+          <div class="item" style="background-color: #777;">5</div>
+          <div class="item" style="background-color: #888;">6</div>
+          <div class="item" style="background-color: #999;">7</div>
+          <div class="item" style="background-color: #aaa;">8</div>
+        </div>
+      </div>
+      <div class="slider-wrap">
+        <div id="slider3" class="slider">
+          <div class="item" style="background-color: #333;">1</div>
+          <div class="item" style="background-color: #444;">2</div>
+          <div class="item" style="background-color: #555;">3</div>
+          <div class="item" style="background-color: #666;">4</div>
+          <div class="item" style="background-color: #777;">5</div>
+          <div class="item" style="background-color: #888;">6</div>
+          <div class="item" style="background-color: #333;">1</div>
+          <div class="item" style="background-color: #444;">2</div>
+          <div class="item" style="background-color: #555;">3</div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

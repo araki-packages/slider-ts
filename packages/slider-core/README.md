@@ -1,3 +1,11 @@
-## core
+# `@araki-packages/slider-core`
 
-TODO
+> TODO: description
+
+## Usage
+
+```
+const sliderCore = require('@araki-packages/slider-core');
+
+// TODO: DEMONSTRATE API
+```
