@@ -32,7 +32,7 @@
     "prebuild": "rimraf dist",
     "test": "jest",
     "build": "rollup -c",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "yarn build",
     "release": "npm publish"
   },
   "bugs": {
