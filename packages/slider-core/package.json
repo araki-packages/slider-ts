@@ -19,7 +19,8 @@
   "files": [
     "dist",
     "src",
-    "types"
+    "types",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"

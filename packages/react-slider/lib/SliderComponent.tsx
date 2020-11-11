@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { Slider } from "@araki-packages/slider-core";
+import React, { useRef } from "react";
 import useSlider from "./useSlider";
 
 const SliderComponent: React.FC<{

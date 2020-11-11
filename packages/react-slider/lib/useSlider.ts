@@ -5,11 +5,11 @@ const useSlider = (
   childNodes: ReactElement[],
   refWrapper: RefObject<HTMLElement>
 ) => {
-  const refSlider = useRef(new Slider());
+  const refSlider = useRef<Slider | null>(null);
 
   const handleMove = useCallback((e: MouseEvent | TouchEvent) => {
-    if (e instanceof MouseEvent) refSlider.current.update(e.pageX);
-    if (e instanceof TouchEvent) refSlider.current.update(e.touches[0].pageX);
+    if (e instanceof MouseEvent) refSlider.current!.update(e.pageX);
+    if (e instanceof TouchEvent) refSlider.current!.update(e.touches[0].pageX);
   }, []);
 
   const handleEnd = useCallback(() => {
@@ -17,14 +17,14 @@ const useSlider = (
     window.removeEventListener("mouseup", handleEnd);
     window.removeEventListener("touchend", handleEnd);
 
-    refSlider.current.end();
+    refSlider.current!.end();
   }, []);
 
   const handleStart: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => {
       e.stopPropagation();
       e.preventDefault();
-      refSlider.current.start(e.pageX);
+      refSlider.current!.start(e.pageX);
       window.addEventListener("mousemove", handleMove, { passive: true });
       window.addEventListener("touchmove", handleMove, { passive: true });
       window.addEventListener("mouseup", handleEnd);
@@ -36,7 +36,7 @@ const useSlider = (
   useEffect(() => {
     if (refWrapper.current == null) return;
     const widthEl = refWrapper.current.scrollWidth;
-    refSlider.current.init(widthEl, childNodes.length);
+    refSlider.current = new Slider(widthEl, childNodes.length);
   }, [childNodes]);
 
   return handleStart;
